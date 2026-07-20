@@ -1,15 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "DATABASE_URL=postgresql://user:pass@localhost:5432/db npx prisma generate && npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
