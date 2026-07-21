@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { carAPI } from '../services/api';
 import { formatEuro } from '../utils/helpers';
-import { useLangStore } from '../store';
+import { useLangStore, useThemeStore } from '../store';
 import { t } from '../utils/i18n';
 import CarCard from '../components/CarCard';
 import { useBreakpoint } from '../hooks/useBreakpoint';
@@ -498,15 +498,26 @@ function FAQSection({ l, isMobile }) {
 
 export default function Home() {
   const { lang } = useLangStore();
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
   const { isMobile, isTablet } = useBreakpoint();
   const [featured, setFeatured]         = useState([]);
   const [promotions, setPromotions]     = useState([]);
   const [campingCars, setCampingCars]   = useState([]);
   const [loading, setLoading]           = useState(true);
   const [trackNum, setTrackNum]         = useState('');
+  const [searchQuery, setSearchQuery]   = useState('');
+  const [selectedCat, setSelectedCat]   = useState('all');
   const heroRef = useRef(null);
   const navigate = useNavigate();
   const l = lang || 'fr';
+
+  const goSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set('search', searchQuery.trim());
+    if (selectedCat && selectedCat !== 'all') params.set('category', selectedCat);
+    navigate(`/catalog?${params.toString()}`);
+  };
   const { scrollYProgress } = useScroll({ target:heroRef, offset:['start start','end start'] });
   const heroY = useTransform(scrollYProgress, [0,1], ['0%','25%']);
   const heroO = useTransform(scrollYProgress, [0,0.7], [1,0]);
@@ -584,6 +595,107 @@ export default function Home() {
           <motion.div animate={{ y:[0,6,0] }} transition={{ repeat:Infinity, duration:1.5, ease:'easeInOut' }}
             style={{ width:1, height:20, background:'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)' }} />
         </motion.div>
+      </section>
+
+      {/* ── SEARCH BAR ── */}
+      <section style={{ background:'var(--bg)', position:'relative', zIndex:10, marginTop:-48 }}>
+        <div style={{ maxWidth:900, margin:'0 auto', padding: isMobile ? '0 4%' : '0 6%' }}>
+          <motion.div
+            initial={{ opacity:0, y:20 }}
+            animate={{ opacity:1, y:0 }}
+            transition={{ duration:0.6, delay:0.6 }}
+            style={{
+              background:'var(--bg-card)',
+              border:'1px solid var(--border)',
+              borderRadius:16,
+              padding: isMobile ? '20px 16px' : '24px 28px',
+              boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.3)' : '0 12px 40px rgba(0,0,0,0.1)',
+            }}
+          >
+            {/* Search input */}
+            <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:16 }}>
+              <div style={{ flex:1, position:'relative' }}>
+                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:16, opacity:0.4, pointerEvents:'none' }}>🔍</span>
+                <input
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && goSearch()}
+                  placeholder={
+                    l==='fr' ? 'Rechercher par marque, modèle...' :
+                    l==='en' ? 'Search by brand, model...' :
+                    l==='de' ? 'Nach Marke, Modell suchen...' :
+                    l==='es' ? 'Buscar por marca, modelo...' :
+                    l==='it' ? 'Cerca per marca, modello...' :
+                    l==='pt' ? 'Pesquisar por marca, modelo...' :
+                    'بحث بالعلامة، الطراز...'
+                  }
+                  style={{
+                    width:'100%',
+                    background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                    border:'1px solid var(--border)',
+                    borderRadius:10,
+                    padding:'12px 14px 12px 42px',
+                    fontSize:15,
+                    fontFamily:"'Outfit',sans-serif",
+                    color:'var(--text)',
+                    outline:'none',
+                    transition:'border-color 0.2s',
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#132853'}
+                  onBlur={e => e.target.style.borderColor = ''}
+                />
+              </div>
+              <button
+                onClick={goSearch}
+                style={{
+                  background:'linear-gradient(135deg, #0E1E3D, #132853)',
+                  border:'none', borderRadius:10,
+                  padding: isMobile ? '12px 20px' : '12px 28px',
+                  color:'#fff', fontWeight:700, fontSize:14,
+                  fontFamily:"'Outfit',sans-serif",
+                  cursor:'pointer',
+                  whiteSpace:'nowrap',
+                  transition:'transform 0.15s',
+                  letterSpacing:'0.02em',
+                }}
+                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.03)'}
+                onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                {l==='fr'?'Rechercher':l==='en'?'Search':l==='de'?'Suchen':l==='es'?'Buscar':l==='it'?'Cerca':l==='pt'?'Pesquisar':'بحث'}
+              </button>
+            </div>
+
+            {/* Category chips */}
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { navigate(`/catalog?category=${cat}`); }}
+                  style={{
+                    background: selectedCat === cat ? 'rgba(19,40,83,0.1)' : 'transparent',
+                    border:`1px solid ${selectedCat === cat ? 'rgba(19,40,83,0.3)' : 'var(--border)'}`,
+                    borderRadius:20,
+                    padding:'6px 14px',
+                    fontSize:12.5,
+                    fontWeight:600,
+                    fontFamily:"'Outfit',sans-serif",
+                    color: selectedCat === cat ? '#132853' : 'var(--text-3)',
+                    cursor:'pointer',
+                    transition:'all 0.15s',
+                    display:'inline-flex',
+                    alignItems:'center',
+                    gap:5,
+                  }}
+                  onMouseOver={e => { if(selectedCat !== cat) { e.currentTarget.style.borderColor = 'rgba(19,40,83,0.2)'; e.currentTarget.style.color = 'var(--text)'; }}}
+                  onMouseOut={e => { if(selectedCat !== cat) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)'; }}}
+                >
+                  <span>{CATEGORY_ICONS[cat]}</span>
+                  {(CAT_LABELS[l] || CAT_LABELS.fr)[cat]}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ── COMMENT ÇA MARCHE ── */}

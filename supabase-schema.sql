@@ -121,3 +121,39 @@ CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
   "started_at"          TIMESTAMP DEFAULT NOW(),
   "applied_steps_count" INT DEFAULT 0
 );
+
+-- Admin account
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+INSERT INTO "User" (
+  "username", "email", "password", "firstName", "lastName",
+  "phone", "role", "emailVerified", "createdAt", "updatedAt"
+) VALUES (
+  'admin',
+  'admin@autopark-gmbh.com',
+  crypt('Autopark2024!', gen_salt('bf', 12)),
+  'Ronny',
+  'Reinsberger',
+  '+49 174 523 29 45',
+  'ADMIN',
+  true,
+  NOW(),
+  NOW()
+);
+
+-- Auto-update "updatedAt" on User and Order
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW."updatedAt" = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_user_updated
+  BEFORE UPDATE ON "User"
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER trg_order_updated
+  BEFORE UPDATE ON "Order"
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
