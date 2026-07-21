@@ -127,7 +127,7 @@ export const authAPI = {
     const { data: authData, error: authErr } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username, firstName, lastName } },
+      options: { data: { username, firstName, lastName, phone, monthlySalary: monthlySalary ? parseFloat(monthlySalary) : null } },
     });
     if (authErr) {
       if (authErr.message?.includes('already registered')) err('Email déjà utilisé');
@@ -135,23 +135,18 @@ export const authAPI = {
     }
     if (!authData.user) err('Erreur d\'inscription');
 
-    const { error: profileErr } = await supabase.from('profiles').insert({
-      id: authData.user.id,
-      email,
-      username,
-      first_name: firstName,
-      last_name: lastName,
-      phone: phone || null,
-      monthly_salary: monthlySalary ? parseFloat(monthlySalary) : null,
-      role: 'CLIENT',
-      email_verified: true,
-    });
-    if (profileErr) {
-      if (profileErr.code === '23505') err('Nom d\'utilisateur déjà pris');
-      err(profileErr.message || 'Erreur profil');
-    }
+    // Le trigger handle_new_user crée le profil automatiquement
+    // On attend un peu puis on récupère le profil
+    await new Promise(r => setTimeout(r, 500));
 
     const profile = await getUserProfile(authData.user.id);
+
+    // Met à jour les champs supplémentaires
+    await supabase.from('profiles').update({
+      phone: phone || null,
+      monthly_salary: monthlySalary ? parseFloat(monthlySalary) : null,
+    }).eq('id', authData.user.id);
+
     const token = authData.session?.access_token || '';
     return ok({ message: 'Compte créé avec succès', token, user: mapProfile(profile) });
   },
