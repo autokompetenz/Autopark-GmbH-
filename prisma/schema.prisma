@@ -33,7 +33,7 @@ enum Category {
   Coupe
   Monospace
   Utilitaire
-  4x4
+  FourX4
 }
 
 enum PaymentType {

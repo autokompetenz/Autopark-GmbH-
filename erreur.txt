@@ -1,0 +1,32 @@
+09:41:17.105 Running build in Washington, D.C., USA (East) – iad1
+09:41:17.105 Build machine configuration: 2 cores, 8 GB
+09:41:17.238 Cloning github.com/autokompetenz/Autopark-GmbH- (Branch: main, Commit: c8fac51)
+09:41:17.558 Cloning completed: 318.000ms
+09:41:17.718 Restored build cache from previous deployment (3qbag9pr6vafhXUBcuoDwqhELeQJ)
+09:41:17.910 Running "vercel build"
+09:41:17.930 Vercel CLI 56.2.0
+09:41:18.814 Installing dependencies...
+09:41:19.771 
+09:41:19.772 > autopark@2.0.0 postinstall
+09:41:19.772 > prisma generate
+09:41:19.772 
+09:41:20.527 Prisma schema loaded from prisma/schema.prisma
+09:41:20.578 Error: Prisma schema validation - (get-dmmf wasm)
+09:41:20.578 Error code: P1012
+09:41:20.579 error: Error validating: The name of a Enum Value must not start with a number.
+09:41:20.579   -->  prisma/schema.prisma:36
+09:41:20.579    | 
+09:41:20.579 35 |   Utilitaire
+09:41:20.579 36 |   4x4
+09:41:20.579    | 
+09:41:20.580 
+09:41:20.580 Validation Error Count: 1
+09:41:20.580 [Context: getDmmf]
+09:41:20.580 
+09:41:20.580 Prisma CLI Version : 5.22.0
+09:41:20.590 npm error code 1
+09:41:20.590 npm error path /vercel/path0
+09:41:20.591 npm error command failed
+09:41:20.591 npm error command sh -c prisma generate
+09:41:20.593 npm error A complete log of this run can be found in: /vercel/.npm/_logs/2026-07-21T08_41_18_938Z-debug-0.log
+09:41:20.621 Error: Command "npm install" exited with 1

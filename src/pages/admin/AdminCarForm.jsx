@@ -263,7 +263,7 @@ export default function AdminCarForm() {
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
             <Field label="Carburant" field="fuelType" opts={['Essence','Diesel','Electrique','Hybride']} value={form.fuelType} onChange={set("fuelType")} />
             <Field label="Transmission" field="transmission" opts={['Automatique','Manuelle']} value={form.transmission} onChange={set("transmission")} />
-            <Field label="Catégorie" field="category" opts={['SUV','Berline','Citadine','Coupe','Break','Monospace','Utilitaire','4x4']} value={form.category} onChange={set("category")} />
+            <Field label="Catégorie" field="category" opts={['SUV','Berline','Citadine','Coupe','Break','Monospace','Utilitaire','FourX4']} value={form.category} onChange={set("category")} />
             <Field label="Kilométrage" field="mileage" type="number" placeholder="0" value={form.mileage} onChange={set("mileage")} />
             <Field label="Puissance (hp)" field="power" type="number" placeholder="150" value={form.power} onChange={set("power")} />
             <Field label="Couleur" field="color" placeholder="Blanc Nacré" value={form.color} onChange={set("color")} />

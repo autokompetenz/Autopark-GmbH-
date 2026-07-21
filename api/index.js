@@ -362,7 +362,7 @@ app.get('/api/cars/categories', async (req, res) => {
       { category: 'Break', _count: { category: 0 } },
       { category: 'Monospace', _count: { category: 0 } },
       { category: 'Utilitaire', _count: { category: 0 } },
-      { category: '4x4', _count: { category: 0 } }
+      { category: 'FourX4', _count: { category: 0 } }
     ];
     
     console.log('Returning categories:', categories);
