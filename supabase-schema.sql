@@ -1,14 +1,37 @@
 -- Autopark GmbH — Supabase Schema
 -- Run this in Supabase SQL Editor if Prisma migrate fails
 
-CREATE TYPE "Role"         AS ENUM ('CLIENT', 'ADMIN');
-CREATE TYPE "FuelType"     AS ENUM ('Essence', 'Diesel', 'Electrique', 'Hybride');
-CREATE TYPE "Transmission" AS ENUM ('Manuelle', 'Automatique');
-CREATE TYPE "Category"     AS ENUM ('Berline', 'SUV', 'Citadine', 'Break', 'Coupe', 'Monospace', 'Utilitaire', '4x4');
-CREATE TYPE "PaymentType"  AS ENUM ('full', 'deposit', 'monthly');
-CREATE TYPE "OrderStatus"  AS ENUM ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled');
+DO $$ BEGIN
+  CREATE TYPE "Role" AS ENUM ('CLIENT', 'ADMIN');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TABLE "User" (
+DO $$ BEGIN
+  CREATE TYPE "FuelType" AS ENUM ('Essence', 'Diesel', 'Electrique', 'Hybride');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "Transmission" AS ENUM ('Manuelle', 'Automatique');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "Category" AS ENUM ('Berline', 'SUV', 'Citadine', 'Break', 'Coupe', 'Monospace', 'Utilitaire', '4x4');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "PaymentType" AS ENUM ('full', 'deposit', 'monthly');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "OrderStatus" AS ENUM ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+CREATE TABLE IF NOT EXISTS "User" (
   "id"            SERIAL PRIMARY KEY,
   "username"      TEXT UNIQUE NOT NULL,
   "email"         TEXT UNIQUE NOT NULL,
@@ -24,7 +47,7 @@ CREATE TABLE "User" (
   "updatedAt"     TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE "Car" (
+CREATE TABLE IF NOT EXISTS "Car" (
   "id"             SERIAL PRIMARY KEY,
   "make"           TEXT NOT NULL,
   "model"          TEXT NOT NULL,
@@ -66,7 +89,7 @@ CREATE TABLE "Car" (
   "createdAt"      TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE "Order" (
+CREATE TABLE IF NOT EXISTS "Order" (
   "id"              SERIAL PRIMARY KEY,
   "orderNumber"     TEXT UNIQUE NOT NULL,
   "userId"          INT NOT NULL REFERENCES "User"("id"),
@@ -83,7 +106,7 @@ CREATE TABLE "Order" (
   "updatedAt"       TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE "OrderItem" (
+CREATE TABLE IF NOT EXISTS "OrderItem" (
   "id"        SERIAL PRIMARY KEY,
   "orderId"   INT NOT NULL REFERENCES "Order"("id") ON DELETE CASCADE,
   "carId"     INT NOT NULL REFERENCES "Car"("id"),
@@ -91,7 +114,7 @@ CREATE TABLE "OrderItem" (
   "unitPrice" FLOAT NOT NULL
 );
 
-CREATE TABLE "OrderTracking" (
+CREATE TABLE IF NOT EXISTS "OrderTracking" (
   "id"        SERIAL PRIMARY KEY,
   "orderId"   INT NOT NULL REFERENCES "Order"("id") ON DELETE CASCADE,
   "status"    "OrderStatus" NOT NULL,
@@ -100,7 +123,7 @@ CREATE TABLE "OrderTracking" (
   "createdAt" TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE "Cart" (
+CREATE TABLE IF NOT EXISTS "Cart" (
   "id"          SERIAL PRIMARY KEY,
   "userId"      INT NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
   "carId"       INT NOT NULL REFERENCES "Car"("id"),
@@ -139,7 +162,7 @@ INSERT INTO "User" (
   true,
   NOW(),
   NOW()
-);
+) ON CONFLICT ("email") DO NOTHING;
 
 -- Auto-update "updatedAt" on User and Order
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -150,10 +173,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_user_updated ON "User";
 CREATE TRIGGER trg_user_updated
   BEFORE UPDATE ON "User"
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+DROP TRIGGER IF EXISTS trg_order_updated ON "Order";
 CREATE TRIGGER trg_order_updated
   BEFORE UPDATE ON "Order"
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
