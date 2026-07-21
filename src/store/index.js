@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { cartAPI, authAPI } from '../services/api';
-import { supabase } from '../services/supabase';
+import { cartAPI } from '../services/api';
 
 // ─── Theme Store ────────────────────────────────────────────────────────────
 const savedTheme = localStorage.getItem('ak_theme') || 'light';
@@ -31,20 +30,17 @@ export const useLangStore = create((set) => ({
 }));
 
 // ─── Auth Store ────────────────────────────────────────────────────────────
-const savedUser = JSON.parse(localStorage.getItem('ak_user') || 'null');
-
 export const useAuthStore = create((set, get) => ({
-  user: savedUser,
+  user: JSON.parse(localStorage.getItem('ak_user') || 'null'),
   token: localStorage.getItem('ak_token') || null,
-  isAuthenticated: !!savedUser,
+  isAuthenticated: !!localStorage.getItem('ak_token'),
 
   login: (user, token) => {
     localStorage.setItem('ak_token', token);
     localStorage.setItem('ak_user', JSON.stringify(user));
     set({ user, token, isAuthenticated: true });
   },
-  logout: async () => {
-    await supabase.auth.signOut();
+  logout: () => {
     localStorage.removeItem('ak_token');
     localStorage.removeItem('ak_user');
     set({ user: null, token: null, isAuthenticated: false });
@@ -55,22 +51,6 @@ export const useAuthStore = create((set, get) => ({
     set({ user: updated });
   },
   isAdmin: () => get().user?.role === 'ADMIN',
-
-  initAuth: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      try {
-        const { data } = await authAPI.getMe();
-        localStorage.setItem('ak_token', session.access_token);
-        localStorage.setItem('ak_user', JSON.stringify(data.user));
-        set({ user: data.user, token: session.access_token, isAuthenticated: true });
-      } catch {
-        localStorage.removeItem('ak_token');
-        localStorage.removeItem('ak_user');
-        set({ user: null, token: null, isAuthenticated: false });
-      }
-    }
-  },
 }));
 
 // ─── Cart Store ────────────────────────────────────────────────────────────

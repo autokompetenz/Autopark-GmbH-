@@ -1,6 +1,18 @@
 -- Autopark GmbH — Supabase Schema (with Auth)
 -- Run this ENTIRE script in Supabase SQL Editor
 
+-- Clean start
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user();
+DROP FUNCTION IF EXISTS update_updated_at();
+DROP FUNCTION IF EXISTS is_admin(UUID);
+DROP TABLE IF EXISTS order_tracking CASCADE;
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS cart CASCADE;
+DROP TABLE IF EXISTS cars CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+
 -- ── PROFILES (extends auth.users) ────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS profiles (
   id            UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -51,6 +63,11 @@ DROP TRIGGER IF EXISTS trg_profiles_updated ON profiles;
 CREATE TRIGGER trg_profiles_updated
   BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Helper: check admin without recursion
+CREATE OR REPLACE FUNCTION is_admin(uid UUID) RETURNS BOOLEAN AS $$
+  SELECT EXISTS (SELECT 1 FROM profiles WHERE id = uid AND role = 'ADMIN');
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 -- ── CARS ─────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS cars (
@@ -166,39 +183,28 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_tracking ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cart ENABLE ROW LEVEL SECURITY;
 
--- Profiles: users can read/update their own, admins can read all
+-- Profiles: users can read/update their own
 CREATE POLICY "profiles_select_own" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
 CREATE POLICY "profiles_update_own" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "profiles_insert_own" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+-- Admin: uses SECURITY DEFINER function (no recursion)
+CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (is_admin(auth.uid()));
 
 -- Cars: everyone reads, admins do everything
 CREATE POLICY "cars_select_public" ON cars FOR SELECT USING (true);
-CREATE POLICY "cars_insert_admin" ON cars FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
-CREATE POLICY "cars_update_admin" ON cars FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
-CREATE POLICY "cars_delete_admin" ON cars FOR DELETE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+CREATE POLICY "cars_insert_admin" ON cars FOR INSERT WITH CHECK (is_admin(auth.uid()));
+CREATE POLICY "cars_update_admin" ON cars FOR UPDATE USING (is_admin(auth.uid()));
+CREATE POLICY "cars_delete_admin" ON cars FOR DELETE USING (is_admin(auth.uid()));
 
 -- Orders: users see their own, admins see all
 CREATE POLICY "orders_select_own" ON orders FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "orders_select_admin" ON orders FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+CREATE POLICY "orders_select_admin" ON orders FOR SELECT USING (is_admin(auth.uid()));
 CREATE POLICY "orders_insert_own" ON orders FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "orders_update_admin" ON orders FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+CREATE POLICY "orders_update_admin" ON orders FOR UPDATE USING (is_admin(auth.uid()));
 
 -- Order items: via order ownership
 CREATE POLICY "order_items_select" ON order_items FOR SELECT USING (
-  EXISTS (SELECT 1 FROM orders WHERE id = order_id AND (user_id = auth.uid() OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')))
+  EXISTS (SELECT 1 FROM orders WHERE id = order_id AND (user_id = auth.uid() OR is_admin(auth.uid())))
 );
 CREATE POLICY "order_items_insert" ON order_items FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM orders WHERE id = order_id AND user_id = auth.uid())
@@ -206,11 +212,9 @@ CREATE POLICY "order_items_insert" ON order_items FOR INSERT WITH CHECK (
 
 -- Order tracking: via order ownership
 CREATE POLICY "order_tracking_select" ON order_tracking FOR SELECT USING (
-  EXISTS (SELECT 1 FROM orders WHERE id = order_id AND (user_id = auth.uid() OR EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')))
+  EXISTS (SELECT 1 FROM orders WHERE id = order_id AND (user_id = auth.uid() OR is_admin(auth.uid())))
 );
-CREATE POLICY "order_tracking_insert" ON order_tracking FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+CREATE POLICY "order_tracking_insert" ON order_tracking FOR INSERT WITH CHECK (is_admin(auth.uid()));
 
 -- Cart: own only
 CREATE POLICY "cart_select_own" ON cart FOR SELECT USING (auth.uid() = user_id);
