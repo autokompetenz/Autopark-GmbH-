@@ -63,12 +63,14 @@ function MainLayout({ children }) {
 
 export default function App() {
   const { lang } = useLangStore();
+  const { initAuth } = useAuthStore();
   const l = lang || 'fr';
 
-  // Apply RTL on load
+  // Apply RTL + restore Supabase session on load
   useEffect(() => {
     document.documentElement.dir = 'ltr';
     document.documentElement.lang = lang;
+    initAuth();
   }, [lang]);
 
   return (
