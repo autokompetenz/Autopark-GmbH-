@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore, useLangStore } from './store/index';
 import { t } from './utils/i18n';
 import Navbar from './components/Navbar';
@@ -90,6 +90,23 @@ function MainLayout({ children }) {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (typeof window.history.scrollRestoration === 'string') {
+      window.history.scrollRestoration = 'manual';
+    }
+    const el = document.documentElement;
+    const prev = el.style.scrollBehavior;
+    el.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    el.style.scrollBehavior = prev;
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   const { lang } = useLangStore();
   const l = lang || 'fr';
@@ -102,6 +119,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toast />
       <Suspense fallback={<RouteFallback />}>
         <Routes>

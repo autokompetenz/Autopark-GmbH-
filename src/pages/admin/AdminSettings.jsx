@@ -13,6 +13,7 @@ const L = {
   ibanPh:    { fr:'Ex : DE89 3704 0044 0532 0130 00', en:'e.g. DE89 3704 0044 0532 0130 00', de:'z. B. DE89 3704 0044 0532 0130 00', es:'Ej.: DE89 3704 0044 0532 0130 00', it:'Es.: DE89 3704 0044 0532 0130 00', pt:'Ex.: DE89 3704 0044 0532 0130 00' },
   bic:       { fr:'BIC', en:'BIC', de:'BIC', es:'BIC', it:'BIC', pt:'BIC' },
   bicPh:     { fr:'Ex : COBADEFFXXX', en:'e.g. COBADEFFXXX', de:'z. B. COBADEFFXXX', es:'Ej.: COBADEFFXXX', it:'Es.: COBADEFFXXX', pt:'Ex.: COBADEFFXXX' },
+  typePh:    { fr:'Ex : SEPA', en:'e.g. SEPA', de:'z. B. SEPA', es:'Ej.: SEPA', it:'Es.: SEPA', pt:'Ex.: SEPA' },
   save:      { fr:'Enregistrer', en:'Save', de:'Speichern', es:'Guardar', it:'Salva', pt:'Salvar' },
   saving:    { fr:'Enregistrement…', en:'Saving…', de:'Speichern…', es:'Guardando…', it:'Salvataggio…', pt:'Salvando…' },
   saved:     { fr:'Coordonnées bancaires mises à jour.', en:'Bank details updated.', de:'Bankdaten aktualisiert.', es:'Datos bancarios actualizados.', it:'Coordinate bancarie aggiornate.', pt:'Dados bancários atualizados.' },
@@ -26,7 +27,7 @@ export default function AdminSettings() {
   const { addToast } = useToastStore();
   const { lang } = useLangStore();
   const l = lang || 'fr';
-  const [form, setForm] = useState({ iban:'', bic:'', beneficiary:'AUTOPARK GMBH' });
+  const [form, setForm] = useState({ iban:'', bic:'', beneficiary:'AUTOPARK GMBH', transferType:'SEPA' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -34,7 +35,7 @@ export default function AdminSettings() {
     bankAPI.getAdmin()
       .then(r => {
         const b = r.data.bank || {};
-        setForm({ iban: b.iban || '', bic: b.bic || '', beneficiary: b.beneficiary || 'AUTOPARK GMBH' });
+        setForm({ iban: b.iban || '', bic: b.bic || '', beneficiary: b.beneficiary || 'AUTOPARK GMBH', transferType: b.transferType || 'SEPA' });
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -106,6 +107,16 @@ export default function AdminSettings() {
                 style={{ width:'100%', fontSize:15, fontFamily:'monospace', letterSpacing:'0.04em' }}
               />
             </div>
+            <div>
+              <label className="section-eyebrow" style={{ display:'block', marginBottom:8 }}>{L.type[l]}</label>
+              <input
+                className="input-luxury"
+                value={form.transferType}
+                onChange={e => setForm(s => ({ ...s, transferType: e.target.value }))}
+                placeholder={L.typePh[l]}
+                style={{ width:'100%', fontSize:15 }}
+              />
+            </div>
             <button type="submit" disabled={saving} className="btn-primary" style={{ fontSize:15, padding:'18px 36px', borderRadius:10, letterSpacing:'0.05em', justifyContent:'center' }}>
               {saving ? L.saving[l] : L.save[l]}
             </button>
@@ -121,7 +132,7 @@ export default function AdminSettings() {
               { label: L.holder[l], value: form.beneficiary },
               { label: L.iban[l], value: form.iban, mono:true },
               { label: L.bic[l], value: form.bic, mono:true },
-              { label: L.type, value: 'SEPA' },
+              { label: L.type, value: form.transferType },
             ].map(({ label, value, mono }, i) => (
               <div key={i} style={{ padding:'12px 14px', background:'var(--bg-card2)', border:'1px solid var(--border)', borderRadius:8 }}>
                 <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--text-3)', marginBottom:4 }}>

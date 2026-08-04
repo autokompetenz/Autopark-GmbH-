@@ -63,6 +63,7 @@ async function main() {
       iban: '',
       bic: '',
       beneficiary: 'AUTOPARK GMBH',
+      transferType: 'SEPA',
     },
   });
 

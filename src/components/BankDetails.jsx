@@ -87,7 +87,7 @@ export default function BankDetails({ bank = {}, reference, compact = false, sty
         {bank.bic && (
           <CopyRow label={L.bic[l]} value={bank.bic} copy={copy} l={l} L={L} mono compact={compact} />
         )}
-        <CopyRow label={L.type[l]} value="SEPA" copy={copy} l={l} L={L} compact={compact} />
+        <CopyRow label={L.type[l]} value={bank.transferType || 'SEPA'} copy={copy} l={l} L={L} compact={compact} />
         {reference && (
           <CopyRow label={L.motif[l]} value={reference} copy={copy} l={l} L={L} mono highlight compact={compact} />
         )}

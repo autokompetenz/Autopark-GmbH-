@@ -180,6 +180,7 @@ model BankInfo {
   iban        String   @default("")
   bic         String   @default("")
   beneficiary String   @default("AUTOPARK GMBH")
+  transferType String  @default("SEPA")
   updatedAt   DateTime @updatedAt
 
   @@map("bank_info")

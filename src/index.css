@@ -433,8 +433,8 @@ input[type='range']::-moz-range-thumb {
   .toast-container { right:12px; left:12px; bottom:12px; align-items:center; }
 
   /* Chatbot */
-  .chat-btn { width:52px; height:52px; font-size:22px; bottom:18px; right:14px; }
-  .chat-window { width:calc(100vw - 28px); right:14px; bottom:84px; max-height:72vh; }
+  .chat-btn { width:52px; height:52px; font-size:22px; bottom:calc(76px + env(safe-area-inset-bottom)); right:14px; }
+  .chat-window { width:calc(100vw - 28px); right:14px; bottom:calc(144px + env(safe-area-inset-bottom)); max-height:72vh; }
 
   /* Admin */
   .admin-mobile-menu-btn { display: flex; }

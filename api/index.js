@@ -1303,7 +1303,7 @@ app.delete('/api/admin/clients/:id', authenticateToken, requireAdmin, async (req
 // Bank settings helper
 async function getBankInfo() {
   const bank = await prisma.bankInfo.findFirst();
-  return bank || { iban: '', bic: '', beneficiary: 'AUTOPARK GMBH' };
+  return bank || { iban: '', bic: '', beneficiary: 'AUTOPARK GMBH', transferType: 'SEPA' };
 }
 
 // Public bank details (shown on order confirmation for wire transfer)
@@ -1329,8 +1329,8 @@ app.get('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => 
 // Admin: update bank settings (single row, upsert)
 app.put('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const { iban, bic, beneficiary } = req.body || {};
-    if (iban === undefined && bic === undefined && beneficiary === undefined) {
+    const { iban, bic, beneficiary, transferType } = req.body || {};
+    if (iban === undefined && bic === undefined && beneficiary === undefined && transferType === undefined) {
       return res.status(400).json({ error: 'Aucune donnée à mettre à jour' });
     }
     const existing = await prisma.bankInfo.findFirst();
@@ -1341,6 +1341,7 @@ app.put('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => 
             iban: iban ?? existing.iban,
             bic: bic ?? existing.bic,
             beneficiary: beneficiary ?? existing.beneficiary,
+            transferType: transferType ?? existing.transferType,
           },
         })
       : await prisma.bankInfo.create({
@@ -1348,6 +1349,7 @@ app.put('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => 
             iban: iban || '',
             bic: bic || '',
             beneficiary: beneficiary || 'AUTOPARK GMBH',
+            transferType: transferType || 'SEPA',
           },
         });
     res.json({ success: true, bank });
