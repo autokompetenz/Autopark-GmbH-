@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { orderAPI } from '../services/api';
 import { useAuthStore, useLangStore } from '../store';
@@ -9,6 +9,7 @@ import { formatEuro } from '../utils/helpers';
 export default function PendingOrderReminder() {
   const { isAuthenticated, user } = useAuthStore();
   const { lang } = useLangStore();
+  const { pathname } = useLocation();
   const l = lang || 'fr';
   const [pendingOrder, setPendingOrder] = useState(null);
 
@@ -20,11 +21,11 @@ export default function PendingOrderReminder() {
         if (cancelled) return;
         const orders = Array.isArray(r.data) ? r.data : [];
         const pending = orders.find((o) => o.status === 'pending');
-        if (pending) setPendingOrder(pending);
+        setPendingOrder(pending || null);
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [isAuthenticated, user?.role]);
+  }, [isAuthenticated, user?.role, pathname]);
 
   if (!pendingOrder) return null;
 
