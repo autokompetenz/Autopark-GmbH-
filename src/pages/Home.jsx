@@ -1072,8 +1072,6 @@ export default function Home() {
       {perf && showCar && (
         <section
           className="section-pad"
-          onMouseEnter={() => setPerfPaused(true)}
-          onMouseLeave={() => setPerfPaused(false)}
           style={{ borderTop:'1px solid var(--border)', background:'linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%)' }}
         >
           <div style={{ maxWidth:1400, margin:'0 auto' }}>
@@ -1096,37 +1094,36 @@ export default function Home() {
               whileInView={{ opacity:1, y:0 }}
               viewport={{ once:true }}
               transition={{ duration:0.6 }}
-              style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? 24 : 40, alignItems:'center' }}
             >
-              {/* Image + contrôles carrousel */}
-              <div style={{ position:'relative' }}>
-                <Link to={`/cars/${showCar.id}`} style={{ textDecoration:'none', display:'block', position:'relative', borderRadius:20, overflow:'hidden', boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.5)' : '0 20px 50px rgba(0,0,0,0.12)' }}>
+              {/* Image + contrôles carrousel (pleine largeur) */}
+              <div style={{ position:'relative' }} onMouseEnter={() => setPerfPaused(true)} onMouseLeave={() => setPerfPaused(false)}>
+                <Link to={`/cars/${showCar.id}`} style={{ textDecoration:'none', display:'block', position:'relative', borderRadius:20, overflow:'hidden', boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.5)' : '0 20px 60px rgba(0,0,0,0.15)' }}>
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={showCar.id}
-                      src={showCar.imageUrl || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'}
+                      src={showCar.imageUrl || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&q=80'}
                       alt={`${showCar.make} ${showCar.model}`}
                       loading="lazy"
                       initial={{ opacity:0, scale:1.06 }}
                       animate={{ opacity:1, scale:1 }}
                       exit={{ opacity:0 }}
                       transition={{ duration:0.45 }}
-                      style={{ width:'100%', height: isMobile ? 240 : 420, objectFit:'cover', display:'block' }}
+                      style={{ width:'100%', height: isMobile ? 320 : 620, objectFit:'cover', display:'block' }}
                     />
                   </AnimatePresence>
-                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.65) 100%)' }} />
-                  <div style={{ position:'absolute', left:18, bottom:18, right:18, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:12 }}>
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.72) 100%)' }} />
+                  <div style={{ position:'absolute', left:28, bottom:26, right:28, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:16 }}>
                     <AnimatePresence mode="wait">
                       <motion.div key={showCar.id} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }} transition={{ duration:0.35 }}>
-                        <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize: isMobile ? 20 : 26, color:'#fff', letterSpacing:'-0.02em' }}>
+                        <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize: isMobile ? 24 : 38, color:'#fff', letterSpacing:'-0.025em' }}>
                           {showCar.make} {showCar.model}
                         </div>
-                        <div style={{ fontSize:13, color:'rgba(255,255,255,0.75)', marginTop:2, fontWeight:600 }}>
+                        <div style={{ fontSize: isMobile ? 14 : 16, color:'rgba(255,255,255,0.8)', marginTop:4, fontWeight:600 }}>
                           {showCar.year} · {formatEuro(showCar.price)}
                         </div>
                       </motion.div>
                     </AnimatePresence>
-                    <div style={{ flexShrink:0, background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', borderRadius:8, padding:'8px 14px', fontSize:12, fontWeight:800, letterSpacing:'0.08em', textTransform:'uppercase' }}>
+                    <div style={{ flexShrink:0, background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', borderRadius:10, padding:'10px 18px', fontSize:13, fontWeight:800, letterSpacing:'0.08em', textTransform:'uppercase' }}>
                       {l==='fr'?'Voir la fiche':l==='en'?'View detail':l==='de'?'Details':l==='es'?'Ver ficha':l==='it'?'Scheda':'Ver ficha'} →
                     </div>
                   </div>
@@ -1137,31 +1134,25 @@ export default function Home() {
                     <button
                       onClick={() => setPerfIndex((perfIndex - 1 + perfCars.length) % perfCars.length)}
                       aria-label="Previous"
-                      style={{ position:'absolute', left:10, top:'42%', transform:'translateY(-50%)', width:38, height:38, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.35)', backdropFilter:'blur(6px)', color:'#fff', fontSize:18, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
+                      style={{ position:'absolute', left:16, top:'50%', transform:'translateY(-50%)', width:48, height:48, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.4)', backdropFilter:'blur(6px)', color:'#fff', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
                     >‹</button>
                     <button
                       onClick={() => setPerfIndex((perfIndex + 1) % perfCars.length)}
                       aria-label="Next"
-                      style={{ position:'absolute', right:10, top:'42%', transform:'translateY(-50%)', width:38, height:38, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.35)', backdropFilter:'blur(6px)', color:'#fff', fontSize:18, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
+                      style={{ position:'absolute', right:16, top:'50%', transform:'translateY(-50%)', width:48, height:48, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.4)', backdropFilter:'blur(6px)', color:'#fff', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
                     >›</button>
                   </>
                 )}
               </div>
 
-              {/* Compteurs (key = remontage → l'animation repart à zéro) */}
-              <div key={showCar.id} style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:20, padding: isMobile ? '28px 8px' : '44px 24px', boxShadow:'var(--shadow-md)' }}>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap: isMobile ? 4 : 20 }}>
-                  <div style={{ display:'flex', justifyContent:'center' }}>
-                    <Speedometer value={perf.power} max={Math.max(700, Math.ceil(perf.power / 50) * 50)} unit={l==='de'?'PS':'hp'} label={l==='fr'?'Puissance':l==='en'?'Power':l==='de'?'Leistung':l==='es'?'Potencia':l==='it'?'Potenza':'Potência'} size={isMobile ? 100 : 200} dark={isDark} />
-                  </div>
-                  <div style={{ display:'flex', justifyContent:'center' }}>
-                    <Speedometer value={perf.topSpeed} max={Math.max(250, Math.ceil((perf.topSpeed + 30) / 50) * 50)} unit="km/h" label={l==='fr'?'Vitesse max':l==='en'?'Top speed':l==='de'?'Höchstgeschwindigkeit':l==='es'?'Velocidad máx':l==='it'?'Velocità max':'Velocidade máx'} size={isMobile ? 100 : 200} dark={isDark} />
-                  </div>
-                  <div style={{ display:'flex', justifyContent:'center' }}>
-                    <Speedometer value={14 - Number(perf.accel)} displayValue={Number(perf.accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 100 : 200} dark={isDark} />
-                  </div>
+              {/* Compteurs (bande pleine largeur · key = l'animation repart à zéro) */}
+              <div key={showCar.id} style={{ marginTop: isMobile ? 20 : 36, background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:20, padding: isMobile ? '34px 8px 28px' : '64px 24px 52px', boxShadow:'var(--shadow-md)' }}>
+                <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', flexWrap:'wrap', gap: isMobile ? 12 : 32 }}>
+                  <Speedometer value={perf.power} max={Math.max(700, Math.ceil(perf.power / 50) * 50)} unit={l==='de'?'PS':'hp'} label={l==='fr'?'Puissance':l==='en'?'Power':l==='de'?'Leistung':l==='es'?'Potencia':l==='it'?'Potenza':'Potência'} size={isMobile ? 140 : 300} dark={isDark} />
+                  <Speedometer value={perf.topSpeed} max={Math.max(250, Math.ceil((perf.topSpeed + 30) / 50) * 50)} unit="km/h" label={l==='fr'?'Vitesse max':l==='en'?'Top speed':l==='de'?'Höchstgeschwindigkeit':l==='es'?'Velocidad máx':l==='it'?'Velocità max':'Velocidade máx'} size={isMobile ? 140 : 300} dark={isDark} />
+                  <Speedometer value={14 - Number(perf.accel)} displayValue={Number(perf.accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 140 : 300} dark={isDark} />
                 </div>
-                <p style={{ textAlign:'center', fontSize:12, color:'var(--text-3)', marginTop: isMobile ? 8 : 16 }}>
+                <p style={{ textAlign:'center', fontSize:12, color:'var(--text-3)', marginTop: isMobile ? 16 : 32 }}>
                   {l==='fr'
                     ? '* Vitesse max et 0–100 km/h : estimations indicatives basées sur la puissance.'
                     : l==='en'
