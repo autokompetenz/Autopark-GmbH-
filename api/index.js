@@ -1152,21 +1152,25 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
     });
 
     res.json({
-      totalClients,
-      totalCars,
-      totalOrders,
-      totalRevenue,
-      pendingOrders,
+      stats: {
+        totalClients,
+        totalCars,
+        totalOrders,
+        totalRevenue,
+        pendingOrders,
+      },
       recentOrders,
     });
   } catch (error) {
     console.error('Admin stats error:', error);
     res.status(500).json({
-      totalClients: 0,
-      totalCars: 0,
-      totalOrders: 0,
-      totalRevenue: 0,
-      pendingOrders: 0,
+      stats: {
+        totalClients: 0,
+        totalCars: 0,
+        totalOrders: 0,
+        totalRevenue: 0,
+        pendingOrders: 0,
+      },
       recentOrders: [],
       error: 'Erreur récupération statistiques'
     });
