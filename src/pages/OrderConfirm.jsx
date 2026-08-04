@@ -5,13 +5,13 @@ import { motion } from 'framer-motion';
 import { orderAPI, bankAPI } from '../services/api';
 import { formatEuro, formatDate } from '../utils/helpers';
 import { Loader } from '../components/UI';
-import { useLangStore, useToastStore } from '../store';
+import BankDetails from '../components/BankDetails';
+import { useLangStore } from '../store';
 
 export default function OrderConfirm() {
   const { orderNumber } = useParams();
   const { lang } = useLangStore();
   const { isMobile } = useBreakpoint();
-  const { addToast } = useToastStore();
   const [order, setOrder] = useState(null);
   const [bank, setBank] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,13 +29,6 @@ export default function OrderConfirm() {
       })
       .catch(() => setLoading(false));
   }, [orderNumber]);
-
-  const copy = (text, label) => {
-    if (!text) return;
-    navigator.clipboard?.writeText(text).then(() => {
-      addToast(`${label} ✓`, 'success');
-    }).catch(() => {});
-  };
 
   const PL = {
     fr: { full:'Paiement intégral (-5%)', deposit:'Acompte 25%',   monthly:'Mensualités 60 mois' },
@@ -61,15 +54,6 @@ export default function OrderConfirm() {
     total:    { fr:'Total',                    en:'Total',                    de:'Gesamt',                     es:'Total',                       it:'Totale',                      pt:'Total' },
     track:    { fr:'Suivre ma commande',       en:'Track my order',           de:'Bestellung verfolgen',       es:'Seguir mi pedido',            it:'Traccia ordine',              pt:'Rastrear pedido' },
     cont:     { fr:'Continuer mes achats',     en:'Continue shopping',        de:'Weiter einkaufen',           es:'Continuar comprando',         it:'Continua gli acquisti',       pt:'Continuar comprando' },
-    transfer: { fr:'Virement bancaire',          en:'Bank transfer',           de:'Überweisung',                es:'Transferencia bancaria',      it:'Bonifico bancario',           pt:'Transferência bancária' },
-    holder:   { fr:'Titulaire',                 en:'Account holder',          de:'Kontoinhaber',               es:'Titular',                     it:'Titolare',                    pt:'Titular' },
-    iban:     { fr:'IBAN',                      en:'IBAN',                     de:'IBAN',                       es:'IBAN',                        it:'IBAN',                        pt:'IBAN' },
-    bic:      { fr:'BIC',                       en:'BIC',                      de:'BIC',                        es:'BIC',                         it:'BIC',                         pt:'BIC' },
-    type:     { fr:'Type de virement',          en:'Transfer type',            de:'Überweisungsart',            es:'Tipo de transferencia',       it:'Tipo di bonifico',            pt:'Tipo de transferência' },
-    motif:    { fr:'Motif du virement',         en:'Payment reference',        de:'Verwendungszweck',           es:'Concepto',                    it:'Causale',                     pt:'Motivo' },
-    copy:     { fr:'Copier',                    en:'Copy',                     de:'Kopieren',                   es:'Copiar',                      it:'Copia',                       pt:'Copiar' },
-    copyDone: { fr:'Copié !',                   en:'Copied!',                  de:'Kopiert!',                   es:'¡Copiado!',                   it:'Copiato!',                    pt:'Copiado!' },
-    transferHint: { fr:'Merci d\'indiquer le motif lors de votre virement afin que nous puissions associer votre paiement à la commande.', en:'Please include the payment reference with your transfer so we can match your payment to the order.', de:'Bitte geben Sie den Verwendungszweck bei Ihrer Überweisung an, damit wir Ihre Zahlung der Bestellung zuordnen können.', es:'Indique el concepto al realizar la transferencia para asociar su pago al pedido.', it:'Indichi la causale nel bonifico per associare il pagamento all\'ordine.', pt:'Indique o motivo na transferência para associarmos o pagamento ao pedido.' },
   };
 
   if (loading) return (
@@ -239,29 +223,7 @@ export default function OrderConfirm() {
 
         {/* Wire transfer details */}
         {bank && (bank.iban || order.paymentReference) && (
-          <div style={{ background:'var(--bg-card)', border:'1px solid var(--red-border)', borderRadius:12, padding: isMobile ? 18 : 24, marginBottom:32, boxShadow:'var(--shadow-sm)' }}>
-            <p style={{ fontSize:11, fontWeight:800, letterSpacing:'0.3em', textTransform:'uppercase', color:'var(--red)', marginBottom:18 }}>
-              💳 {L.transfer[l]}
-            </p>
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-              {bank.beneficiary && (
-                <CopyRow label={L.holder[l]} value={bank.beneficiary} copy={copy} l={l} L={L} />
-              )}
-              {bank.iban && (
-                <CopyRow label={L.iban[l]} value={bank.iban} copy={copy} l={l} L={L} mono />
-              )}
-              {bank.bic && (
-                <CopyRow label={L.bic[l]} value={bank.bic} copy={copy} l={l} L={L} mono />
-              )}
-              <CopyRow label={L.type[l]} value="SEPA" copy={copy} l={l} L={L} />
-              {order.paymentReference && (
-                <CopyRow label={L.motif[l]} value={order.paymentReference} copy={copy} l={l} L={L} mono highlight />
-              )}
-            </div>
-            <p style={{ fontSize:13, color:'var(--text-3)', marginTop:16, lineHeight:1.6 }}>
-              {L.transferHint[l]}
-            </p>
-          </div>
+          <BankDetails bank={bank} reference={order.paymentReference} />
         )}
 
         {/* CTAs */}
@@ -274,41 +236,6 @@ export default function OrderConfirm() {
           </Link>
         </div>
       </div>
-    </div>
-  );
-}
-
-function CopyRow({ label, value, copy, l, L, mono, highlight }) {
-  return (
-    <div style={{
-      display:'flex', alignItems:'center', gap:12,
-      padding:'12px 14px', background: highlight ? 'var(--red-bg)' : 'var(--bg-card2)',
-      border:`1px solid ${highlight ? 'var(--red-border)' : 'var(--border)'}`,
-      borderRadius:8,
-    }}>
-      <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--text-3)', marginBottom:4 }}>
-          {label}
-        </p>
-        <p style={{
-          fontFamily: mono ? 'monospace' : "'Outfit',sans-serif",
-          fontWeight: highlight ? 900 : 700,
-          fontSize: mono ? 15 : 16,
-          color: highlight ? 'var(--red)' : 'var(--text)',
-          letterSpacing: mono ? '0.04em' : '0',
-          wordBreak:'break-all',
-        }}>
-          {value}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={() => copy(value, L.copyDone[l])}
-        className="btn-ghost"
-        style={{ fontSize:12, padding:'8px 14px', flexShrink:0 }}
-      >
-        {L.copy[l]}
-      </button>
     </div>
   );
 }

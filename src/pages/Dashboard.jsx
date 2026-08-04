@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { orderAPI } from '../services/api';
+import { orderAPI, bankAPI } from '../services/api';
 import { useAuthStore, useCartStore, useLangStore } from '../store';
 import { formatEuro, formatDate, getInitials } from '../utils/helpers';
 import { StatusBadge, Loader } from '../components/UI';
+import BankDetails from '../components/BankDetails';
 import { t } from '../utils/i18n';
 import { useBreakpoint } from '../hooks/useBreakpoint';
 
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const { lang } = useLangStore();
   const { isMobile, isTablet } = useBreakpoint();
   const [orders, setOrders]   = useState([]);
+  const [bank, setBank]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [params]              = useSearchParams();
   const [navOpen, setNavOpen] = useState(false);
@@ -32,6 +34,10 @@ export default function Dashboard() {
     orderAPI.getMy().then(r => {
       setOrders(Array.isArray(r.data) ? r.data.slice(0,5) : []);
     }).catch(()=>{}).finally(()=>setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    bankAPI.get().then(r => setBank(r.data?.bank || null)).catch(() => {});
   }, []);
 
   const maxMonthly = user?.monthlySalary ? Math.round(user.monthlySalary * 0.33) : null;
@@ -189,6 +195,17 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Coordonnées bancaires */}
+            {bank && (bank.iban || bank.bic) && (
+              <div style={{ marginBottom:24 }}>
+                <BankDetails
+                  bank={bank}
+                  title={lang==='fr'?'Coordonnées bancaires':lang==='en'?'Bank details':lang==='de'?'Bankdaten':lang==='es'?'Datos bancarios':lang==='it'?'Coordinate bancarie':'Dados bancários'}
+                  compact
+                />
+              </div>
+            )}
 
             {/* Confiance & conformité */}
             <div style={{ marginBottom:24, padding:'18px 20px', background:'var(--bg-card2)', border:'1px solid var(--border)', borderRadius:12 }}>

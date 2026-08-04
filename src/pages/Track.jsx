@@ -1,10 +1,11 @@
 import { useBreakpoint } from '../hooks/useBreakpoint';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { orderAPI } from '../services/api';
+import { orderAPI, bankAPI } from '../services/api';
 import { formatEuro, formatDate, timeAgo, STATUS_STEPS } from '../utils/helpers';
 import { StatusBadge, Loader } from '../components/UI';
+import BankDetails from '../components/BankDetails';
 import { useLangStore } from '../store';
 
 const STEP_ICONS = { pending:'📋', confirmed:'✅', processing:'🔧', shipped:'🚚', delivered:'🏠' };
@@ -34,6 +35,7 @@ export default function Track() {
   const { isMobile } = useBreakpoint();
   const [input, setInput] = useState(paramNum || '');
   const [order, setOrder] = useState(null);
+  const [bank, setBank] = useState(null);
   const [loading, setLoading] = useState(!!paramNum);
   const [error, setError] = useState('');
   const l = lang || 'fr';
@@ -52,6 +54,10 @@ export default function Track() {
       ));
     } finally { setLoading(false); }
   };
+
+  useEffect(() => {
+    bankAPI.get().then(r => setBank(r.data?.bank || null)).catch(() => {});
+  }, []);
 
   useState(() => { if (paramNum) fetchOrder(paramNum); }, []);
 
@@ -217,6 +223,11 @@ export default function Track() {
                 </div>
               </div>
             </div>
+
+            {/* Bank details for transfer */}
+            {bank && (bank.iban || order.paymentReference) && (
+              <BankDetails bank={bank} reference={order.paymentReference} />
+            )}
 
             {/* History timeline */}
             {order.tracking?.length > 0 && (
