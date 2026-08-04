@@ -15,7 +15,9 @@ export default function Navbar() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [plusOpen, setPlusOpen] = useState(false);
   const menuRef = useRef(null);
+  const plusRef = useRef(null);
   const isDark = theme === 'dark';
 
   useEffect(() => {
@@ -25,10 +27,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { if (isAuthenticated) fetchCount(); }, [isAuthenticated]);
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  useEffect(() => { setMenuOpen(false); setPlusOpen(false); }, [location.pathname]);
 
   useEffect(() => {
-    const h = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    const h = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      if (plusRef.current && !plusRef.current.contains(e.target)) setPlusOpen(false);
+    };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, []);
@@ -137,14 +142,66 @@ export default function Navbar() {
         {!isMobile && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 32, position: 'relative', zIndex: 1 }}>
             <NavLink to="/catalog"     label={t('nav_vehicles', lang)} />
-            <NavLink to="/marques"     label={t('nav_brands', lang)} />
-            <NavLink to="/camping-car" label="Camping Car" />
             <NavLink to="/simulation"  label={t('nav_financing', lang)} />
-            <NavLink to="/warranty"    label={t('nav_warranty', lang) || 'Garantie'} />
-            <NavLink to="/insurance"   label={t('nav_insurance', lang) || 'Assurance'} />
             <NavLink to="/vendre"      label={t('nav_sell', lang)} />
-            <NavLink to="/avis"        label={t('reviews_label', lang)} />
             <NavLink to="/contact"     label={t('nav_contact', lang)} />
+
+            {/* More dropdown */}
+            <div style={{ position: 'relative' }} ref={plusRef}>
+              <button
+                onClick={() => setPlusOpen(!plusOpen)}
+                style={{
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: plusOpen ? 'var(--red)' : navTextColor,
+                  textDecoration: 'none', transition: 'color 0.25s', cursor: 'pointer',
+                  background: 'transparent', border: 'none', padding: 0, fontFamily: F,
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}
+                onMouseOver={e => e.currentTarget.style.color = 'var(--red)'}
+                onMouseOut={e => e.currentTarget.style.color = plusOpen ? 'var(--red)' : navTextColor}>
+                {t('nav_more', lang)}
+                <span style={{ fontSize: 8, opacity: 0.6, transform: plusOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s' }}>▼</span>
+              </button>
+
+              <AnimatePresence>
+                {plusOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.97, x: '-50%' }}
+                    animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+                    exit={{ opacity: 0, y: 6, scale: 0.97, x: '-50%' }}
+                    transition={{ duration: 0.2, ease: [0.16,1,0.3,1] }}
+                    style={{
+                      position: 'absolute', top: 'calc(100% + 14px)', left: '50%',
+                      background: menuBg, border: `1px solid ${menuBorder}`, borderRadius: 10,
+                      boxShadow: '0 8px 40px rgba(0,0,0,0.20)', minWidth: 220, padding: 6, zIndex: 9999,
+                    }}>
+                    {[
+                      { to: '/marques',     label: t('nav_brands', lang),      icon: '🏷️' },
+                      { to: '/camping-car', label: 'Camping Car',                icon: '🚐' },
+                      { to: '/warranty',    label: t('nav_warranty', lang),      icon: '🛡️' },
+                      { to: '/insurance',   label: t('nav_insurance', lang),     icon: '📋' },
+                      { to: '/livraison',   label: t('nav_delivery', lang),      icon: '🚚' },
+                      { to: '/maintenance', label: t('nav_maintenance', lang),   icon: '🔧' },
+                      { to: '/faq',         label: t('nav_faq', lang),           icon: '❓' },
+                      { to: '/a-propos',    label: t('nav_about', lang),         icon: '🏛️' },
+                      { to: '/avis',        label: t('reviews_label', lang),     icon: '⭐' },
+                    ].map(({ to, label, icon }) => (
+                      <Link key={to} to={to} onClick={() => setPlusOpen(false)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px',
+                          fontSize: 13, color: menuText2, textDecoration: 'none', borderRadius: 7,
+                          fontFamily: F, fontWeight: 500, transition: 'background 0.15s, color 0.15s',
+                        }}
+                        onMouseOver={e => { e.currentTarget.style.background = menuHover; e.currentTarget.style.color = 'var(--red)'; }}
+                        onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = menuText2; }}>
+                        <span style={{ fontSize: 15, width: 18, textAlign: 'center', flexShrink: 0 }}>{icon}</span>
+                        {label}
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         )}
 

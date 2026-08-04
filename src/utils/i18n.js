@@ -13,6 +13,7 @@ export const translations = {
   nav_financing:    { fr:'Financement',        en:'Financing',         de:'Finanzierung',      es:'Financiación',     it:'Finanziamento',    pt:'Financiamento' },
   nav_track:        { fr:'Suivi commande',     en:'Track Order',       de:'Bestellung',        es:'Seguimiento',      it:'Traccia ordine',   pt:'Rastrear' },
   nav_contact:      { fr:'Contact',            en:'Contact',           de:'Kontakt',           es:'Contacto',         it:'Contatto',         pt:'Contato' },
+  nav_more:         { fr:'Plus',               en:'More',              de:'Mehr',              es:'Más',              it:'Altro',            pt:'Mais' },
   nav_login:        { fr:'Connexion',          en:'Login',             de:'Anmelden',          es:'Iniciar sesión',   it:'Accedi',           pt:'Entrar' },
   nav_register:     { fr:"S'inscrire",         en:'Register',          de:'Registrieren',      es:'Registrarse',      it:'Registrati',       pt:'Registrar' },
   nav_cart:         { fr:'Panier',             en:'Cart',              de:'Warenkorb',         es:'Carrito',          it:'Carrello',         pt:'Carrinho' },
