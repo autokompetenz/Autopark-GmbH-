@@ -7,6 +7,7 @@ import { useLangStore, useThemeStore } from '../store';
 import { t } from '../utils/i18n';
 import CarCard from '../components/CarCard';
 import BrandLogo from '../components/BrandLogo';
+import Speedometer from '../components/Speedometer';
 import { useBreakpoint } from '../hooks/useBreakpoint';
 import { ALL_REVIEWS } from '../utils/reviews';
 import { CATEGORIES, CAT_LABELS, CATEGORY_ICONS } from '../utils/categories';
@@ -605,6 +606,16 @@ export default function Home() {
     if (trackNum.trim()) navigate(`/track/${trackNum.trim().toUpperCase()}`);
   };
 
+  const showcaseCar = [...featured, ...promotions, ...campingCars]
+    .filter(c => c && Number(c.power))
+    .sort((a, b) => Number(b.power) - Number(a.power))[0] || null;
+
+  const perf = showcaseCar ? {
+    power: Number(showcaseCar.power),
+    topSpeed: Math.min(340, Math.round(145 + Number(showcaseCar.power) * 0.4)),
+    accel: Math.max(3, Math.min(14, 13.5 - Number(showcaseCar.power) * 0.029)).toFixed(1),
+  } : null;
+
   const getServiceTitle = (s) => s[l] || s.fr;
   const getServiceDesc  = (s) => s[`desc${l.charAt(0).toUpperCase()+l.slice(1)}`] || s.descFr;
   const getReviewText   = (r) => r[`text${l.charAt(0).toUpperCase()+l.slice(1)}`] || r.textFr;
@@ -1045,6 +1056,89 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── PERFORMANCE (compteurs animés) ── */}
+      {perf && showcaseCar && (
+        <section className="section-pad" style={{ borderTop:'1px solid var(--border)', background:'linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%)' }}>
+          <div style={{ maxWidth:1400, margin:'0 auto' }}>
+            <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:16, marginBottom:44 }}>
+              <div>
+                <div className="section-eyebrow">
+                  {l==='fr'?'PERFORMANCE':l==='en'?'PERFORMANCE':l==='de'?'LEISTUNG':l==='es'?'RENDIMIENTO':l==='it'?'PRESTAZIONI':'DESEMPENHO'}
+                </div>
+                <h2 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:'clamp(28px,4vw,48px)', color:'var(--text)', letterSpacing:'-0.025em', lineHeight:1.05 }}>
+                  {l==='fr'?'La performance\nincarnée':l==='en'?'Performance\nembodied':l==='de'?'Leistung,\ndie man erlebt':l==='es'?'El rendimiento\nen su máxima expresión':l==='it'?'La prestazione\nin persona':'O desempenho\nencarnado'}
+                </h2>
+              </div>
+              <Link to={`/cars/${showcaseCar.id}`} className="btn-outline" style={{ whiteSpace:'nowrap' }}>
+                {l==='fr'?'Découvrir cette voiture':l==='en'?'Discover this car':l==='de'?'Dieses Auto entdecken':l==='es'?'Descubrir este coche':l==='it'?'Scopri questa auto':'Descobrir este carro'} →
+              </Link>
+            </div>
+
+            <motion.div
+              initial={{ opacity:0, y:24 }}
+              whileInView={{ opacity:1, y:0 }}
+              viewport={{ once:true }}
+              transition={{ duration:0.6 }}
+              style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? 24 : 40, alignItems:'center' }}
+            >
+              {/* Image de la voiture vedette */}
+              <Link to={`/cars/${showcaseCar.id}`} style={{ textDecoration:'none', display:'block', position:'relative', borderRadius:20, overflow:'hidden', boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.5)' : '0 20px 50px rgba(0,0,0,0.12)' }}>
+                <img
+                  src={showcaseCar.imageUrl || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80'}
+                  alt={`${showcaseCar.make} ${showcaseCar.model}`}
+                  loading="lazy"
+                  style={{ width:'100%', height: isMobile ? 240 : 420, objectFit:'cover', display:'block', transition:'transform 0.6s cubic-bezier(0.16,1,0.3,1)' }}
+                  onMouseOver={e => { e.currentTarget.style.transform='scale(1.04)'; }}
+                  onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; }}
+                />
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.65) 100%)' }} />
+                <div style={{ position:'absolute', left:18, bottom:18, right:18, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:12 }}>
+                  <div>
+                    <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize: isMobile ? 20 : 26, color:'#fff', letterSpacing:'-0.02em' }}>
+                      {showcaseCar.make} {showcaseCar.model}
+                    </div>
+                    <div style={{ fontSize:13, color:'rgba(255,255,255,0.75)', marginTop:2, fontWeight:600 }}>
+                      {showcaseCar.year} · {formatEuro(showcaseCar.price)}
+                    </div>
+                  </div>
+                  <div style={{ flexShrink:0, background:'rgba(255,255,255,0.15)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', borderRadius:8, padding:'8px 14px', fontSize:12, fontWeight:800, letterSpacing:'0.08em', textTransform:'uppercase' }}>
+                    {l==='fr'?'Voir la fiche':l==='en'?'View detail':l==='de'?'Details':l==='es'?'Ver ficha':l==='it'?'Scheda':'Ver ficha'} →
+                  </div>
+                </div>
+              </Link>
+
+              {/* Compteurs */}
+              <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:20, padding: isMobile ? '28px 8px' : '44px 24px', boxShadow:'var(--shadow-md)' }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap: isMobile ? 4 : 20 }}>
+                  <div style={{ display:'flex', justifyContent:'center' }}>
+                    <Speedometer value={perf.power} max={Math.max(700, Math.ceil(perf.power / 50) * 50)} unit={l==='de'?'PS':'hp'} label={l==='fr'?'Puissance':l==='en'?'Power':l==='de'?'Leistung':l==='es'?'Potencia':l==='it'?'Potenza':'Potência'} size={isMobile ? 100 : 200} dark={isDark} />
+                  </div>
+                  <div style={{ display:'flex', justifyContent:'center' }}>
+                    <Speedometer value={perf.topSpeed} max={340} unit="km/h" label={l==='fr'?'Vitesse max':l==='en'?'Top speed':l==='de'?'Höchstgeschwindigkeit':l==='es'?'Velocidad máx':l==='it'?'Velocità max':'Velocidade máx'} size={isMobile ? 100 : 200} dark={isDark} />
+                  </div>
+                  <div style={{ display:'flex', justifyContent:'center' }}>
+                    <Speedometer value={14 - Number(perf.accel)} displayValue={Number(perf.accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 100 : 200} dark={isDark} />
+                  </div>
+                </div>
+                <p style={{ textAlign:'center', fontSize:12, color:'var(--text-3)', marginTop: isMobile ? 8 : 16 }}>
+                  {l==='fr'
+                    ? '* Vitesse max et 0–100 km/h : estimations indicatives basées sur la puissance.'
+                    : l==='en'
+                    ? '* Top speed and 0–100 km/h: indicative estimates based on power output.'
+                    : l==='de'
+                    ? '* Höchstgeschwindigkeit und 0–100 km/h: Richtwerte auf Basis der Motorleistung.'
+                    : l==='es'
+                    ? '* Velocidad máxima y 0–100 km/h: estimaciones indicativas según la potencia.'
+                    : l==='it'
+                    ? '* Velocità massima e 0–100 km/h: stime indicative in base alla potenza.'
+                    : '* Velocidade máxima e 0–100 km/h: estimativas indicativas com base na potência.'}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── PROMOTIONS ── */}
       {promotions.length > 0 && (
