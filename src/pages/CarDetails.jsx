@@ -125,7 +125,7 @@ export default function CarDetails() {
   const images = IMAGE_FIELDS.map(f => car?.[f]).filter(Boolean);
 
   const powerHp = Number(car?.power) || 0;
-  const topSpeed = powerHp ? Math.min(340, Math.round(145 + powerHp * 0.4)) : 0;
+  const topSpeed = powerHp ? Math.min(250, Math.round(155 + powerHp * 0.34)) : 0;
   const accel = powerHp ? Math.max(3, Math.min(14, 13.5 - powerHp * 0.029)).toFixed(1) : '0.0';
 
   const breadcrumbs   = { fr:'Accueil', en:'Home', de:'Startseite', ar:'الرئيسية' };
@@ -344,7 +344,7 @@ export default function CarDetails() {
                   <Speedometer value={powerHp} max={Math.max(700, Math.ceil(powerHp / 50) * 50)} unit={lang === 'de' ? 'PS' : 'hp'} label={lang === 'fr' ? 'Puissance' : lang === 'en' ? 'Power' : lang === 'de' ? 'Leistung' : 'القوة'} size={isMobile ? 104 : 210} dark={isDark} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <Speedometer value={topSpeed} max={340} unit="km/h" label={lang === 'fr' ? 'Vitesse max' : lang === 'en' ? 'Top speed' : lang === 'de' ? 'Höchstgeschwindigkeit' : 'السرعة القصوى'} size={isMobile ? 104 : 210} dark={isDark} />
+                  <Speedometer value={topSpeed} max={Math.max(250, Math.ceil((topSpeed + 30) / 50) * 50)} unit="km/h" label={lang === 'fr' ? 'Vitesse max' : lang === 'en' ? 'Top speed' : lang === 'de' ? 'Höchstgeschwindigkeit' : 'السرعة القصوى'} size={isMobile ? 104 : 210} dark={isDark} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <Speedometer value={14 - Number(accel)} displayValue={Number(accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 104 : 210} dark={isDark} />
