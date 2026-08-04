@@ -496,6 +496,69 @@ function FAQSection({ l, isMobile }) {
   );
 }
 
+// ── VIDEO PROMO SECTION ────────────────────────────────────────────────────
+function VideoSection({ isMobile }) {
+  const { lang } = useLangStore();
+  const l = lang || 'fr';
+
+  return (
+    <section style={{
+      position:'relative', overflow:'hidden',
+      height: isMobile ? '62vh' : '88vh', minHeight: isMobile ? 420 : 520,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      background:'#0a0a0a',
+    }}>
+      <video
+        autoPlay muted loop playsInline preload="auto"
+        src="/promo.mp4"
+        style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+      />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.6) 100%)' }} />
+
+      <motion.div
+        initial={{ opacity:0, y:30 }}
+        whileInView={{ opacity:1, y:0 }}
+        viewport={{ once:true }}
+        transition={{ duration:0.9 }}
+        style={{ position:'relative', zIndex:2, textAlign:'center', padding:'0 6%', maxWidth:900 }}
+      >
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:14, marginBottom:28 }}>
+          <span style={{ width: isMobile ? 30 : 48, height:1, background:'rgba(255,255,255,0.4)' }} />
+          <span style={{ fontSize:10, fontWeight:600, letterSpacing:'0.35em', textTransform:'uppercase', color:'rgba(255,255,255,0.7)' }}>
+            {l==='fr'?'Votre spécialiste automobile':l==='en'?'Your car specialist':l==='de'?'Ihr Kfz-Spezialist':l==='es'?'Su especialista automotriz':l==='it'?'Il vostro specialista auto':l==='pt'?'O seu especialista automóvel':'متجر السيارات'}
+          </span>
+          <span style={{ width: isMobile ? 30 : 48, height:1, background:'rgba(255,255,255,0.4)' }} />
+        </div>
+
+        <h2 style={{
+          fontFamily:"'Outfit',sans-serif", fontWeight:900,
+          fontSize: isMobile ? 'clamp(40px,12vw,64px)' : 'clamp(56px,9vw,120px)',
+          color:'#fff', letterSpacing:'-0.03em', lineHeight:0.98, marginBottom:24,
+          textShadow:'0 4px 40px rgba(0,0,0,0.5)',
+        }}>
+          AUTOPARK{' '}
+          <span style={{ background:'linear-gradient(120deg,#FFD24D,#FF9F2E)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+            GMBH
+          </span>
+        </h2>
+
+        <p style={{ fontSize: isMobile ? 14 : 17, color:'rgba(255,255,255,0.75)', lineHeight:1.7, maxWidth:560, margin:'0 auto 36px', fontWeight:300 }}>
+          {l==='fr'?'Des véhicules d\'exception, une expertise allemande depuis 1979. Découvrez notre univers.':l==='en'?'Exceptional vehicles, German expertise since 1979. Discover our world.':l==='de'?'Außergewöhnliche Fahrzeuge, deutsche Kompetenz seit 1979. Entdecken Sie unsere Welt.':l==='es'?'Vehículos excepcionales, experiencia alemana desde 1979. Descubra nuestro mundo.':l==='it'?'Veicoli eccezionali, competenza tedesca dal 1979. Scoprite il nostro mondo.':'Veículos excecionais, experiência alemã desde 1979. Descubra o nosso mundo.'}
+        </p>
+
+        <Link to="/catalog" style={{
+          background:'linear-gradient(135deg,#132853,#0E1E3D)', color:'#fff', textDecoration:'none',
+          fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:700, padding:'15px 32px',
+          borderRadius:8, display:'inline-flex', alignItems:'center', gap:8,
+          boxShadow:'0 8px 30px rgba(0,0,0,0.4)',
+        }}>
+          {l==='fr'?'Voir nos véhicules':l==='en'?'View our vehicles':l==='de'?'Fahrzeuge ansehen':l==='es'?'Ver nuestros vehículos':l==='it'?'Guarda i nostri veicoli':l==='pt'?'Veja os nossos veículos':'عرض السيارات'} →
+        </Link>
+      </motion.div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { lang } = useLangStore();
   const { theme } = useThemeStore();
@@ -697,6 +760,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── PROMO VIDEO ── */}
+      <VideoSection isMobile={isMobile} />
 
       {/* ── COMMENT ÇA MARCHE ── */}
       <section style={{ background:'var(--bg)', borderBottom:'1px solid var(--border)' }} className="section-pad">
