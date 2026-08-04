@@ -28,18 +28,50 @@ export default function Contact() {
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+  const WA_NUMBER = '491745232945';
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name || !form.message) {
       addToast(t({ fr:'Veuillez remplir votre nom et votre message', en:'Please fill in your name and message', de:'Bitte Namen und Nachricht ausfüllen', es:'Rellene su nombre y mensaje', it:'Compilare nome e messaggio', pt:'Preencha o nome e a mensagem' }), 'error');
       return;
     }
+
+    const waText = [
+      `💬 *Nouveau message — Autopark GmbH*`,
+      ``,
+      `Nom : ${form.name}`,
+      `Email : ${form.email || '—'}`,
+      `Téléphone : ${form.phone || '—'}`,
+      `Sujet : ${form.subject || '—'}`,
+      ``,
+      form.message,
+    ].filter(Boolean).join('\n');
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waText)}`, '_blank');
+
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      addToast(t({ fr:'Message envoyé ! Nous vous répondrons rapidement.', en:'Message sent! We will reply shortly.', de:'Nachricht gesendet! Wir antworten schnellstmöglich.', es:'¡Mensaje enviado! Responderemos pronto.', it:'Messaggio inviato! Risponderemo presto.', pt:'Mensagem enviada! Responderemos em breve.' }), 'success');
-      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 700);
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contact',
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        subject: form.subject,
+        message: form.message,
+      }),
+    })
+      .then((res) => {
+        setSubmitting(false);
+        if (!res.ok) throw new Error();
+        addToast(t({ fr:'Message envoyé ! Nous vous répondrons rapidement.', en:'Message sent! We will reply shortly.', de:'Nachricht gesendet! Wir antworten schnellstmöglich.', es:'¡Mensaje enviado! Responderemos pronto.', it:'Messaggio inviato! Risponderemo presto.', pt:'Mensagem enviada! Responderemos em breve.' }), 'success');
+        setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+      })
+      .catch(() => {
+        setSubmitting(false);
+        addToast(t({ fr:'Envoi impossible, votre message WhatsApp s\'est ouvert — finalisez-le pour nous joindre.', en:'Sending failed, your WhatsApp message opened — complete it to reach us.', de:'Senden fehlgeschlagen — Ihre WhatsApp-Nachricht wurde geöffnet, bitte abschließen.', es:'No se pudo enviar, su mensaje de WhatsApp se abrió — complételo para contactarnos.', it:'Invio non riuscito, il messaggio WhatsApp si è aperto — completatelo per contattarci.', pt:'Envio falhado, a sua mensagem WhatsApp abriu — conclua-a para nos contactar.' }), 'error');
+      });
   };
 
   const contactCards = [

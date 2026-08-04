@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
 const { prisma } = require('../lib/prisma.js');
-const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } = require('../lib/mailer.js');
+const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendLeadEmail } = require('../lib/mailer.js');
 const { calculateMonthlyPayment } = require('../lib/helpers.js');
 
 // Initialize Express app
@@ -204,6 +204,32 @@ app.get('/api', (req, res) => {
     version: '2.0.0', 
     time: new Date().toISOString() 
   });
+});
+
+// Lead Routes (public forms: sell & contact)
+app.post('/api/leads', async (req, res) => {
+  try {
+    const { type, ...data } = req.body || {};
+    const leadType = type === 'sell' ? 'sell' : 'contact';
+    const name = String(data.name || '').trim();
+    const contact = String(data.phone || data.email || '').trim();
+
+    if (!name || !contact) {
+      return res.status(400).json({ error: 'Nom et coordonnées requis' });
+    }
+
+    const message = String(data.message || data.notes || '').trim();
+    if (message.length > 10000) {
+      return res.status(400).json({ error: 'Message trop long' });
+    }
+
+    await sendLeadEmail({ type: leadType, data: { ...data, type: undefined } });
+
+    res.status(201).json({ success: true, message: 'Demande enregistrée' });
+  } catch (e) {
+    console.error('Lead error:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
 // Authentication Routes

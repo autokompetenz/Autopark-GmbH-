@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBreakpoint } from '../hooks/useBreakpoint';
 import { useLangStore } from '../store';
+import { BRANDS } from '../utils/brands';
+import BrandLogo from '../components/BrandLogo';
 
 export default function Brands() {
   const { lang } = useLangStore();
@@ -22,36 +24,7 @@ export default function Brands() {
 
   const t = (obj) => obj[l] || obj.fr;
 
-  const brands = [
-    { name: 'BMW', color: '#0066B1', initials: 'BM' },
-    { name: 'Mercedes-Benz', color: '#0A1E2E', initials: 'MB' },
-    { name: 'Audi', color: '#BB0A30', initials: 'AU' },
-    { name: 'Volkswagen', color: '#1A1A1A', initials: 'VW' },
-    { name: 'Porsche', color: '#B12B28', initials: 'PO' },
-    { name: 'Toyota', color: '#EB0A1E', initials: 'TO' },
-    { name: 'Honda', color: '#CC0000', initials: 'HO' },
-    { name: 'Hyundai', color: '#002C5F', initials: 'HY' },
-    { name: 'Kia', color: '#BB162B', initials: 'KI' },
-    { name: 'Ford', color: '#003478', initials: 'FO' },
-    { name: 'Opel', color: '#F1D315', initials: 'OP' },
-    { name: 'Renault', color: '#FFC300', initials: 'RE' },
-    { name: 'Peugeot', color: '#000000', initials: 'PE' },
-    { name: 'Tesla', color: '#CC0000', initials: 'TE' },
-    { name: 'Volvo', color: '#003057', initials: 'VO' },
-    { name: 'Nissan', color: '#C3002F', initials: 'NI' },
-    { name: 'Citroën', color: '#DA291C', initials: 'CI' },
-    { name: 'Fiat', color: '#0066B1', initials: 'FI' },
-    { name: 'Škoda', color: '#008000', initials: 'SK' },
-    { name: 'Seat', color: '#D50032', initials: 'SE' },
-    { name: 'Dacia', color: '#007979', initials: 'DA' },
-    { name: 'Mazda', color: '#C8121A', initials: 'MA' },
-    { name: 'Suzuki', color: '#003B8E', initials: 'SU' },
-    { name: 'Land Rover', color: '#006B54', initials: 'LR' },
-    { name: 'Jeep', color: '#1A1A1A', initials: 'JP' },
-    { name: 'Mini', color: '#2E6E3E', initials: 'MI' },
-    { name: 'Lexus', color: '#1B1B1B', initials: 'LX' },
-    { name: 'Alfa Romeo', color: '#003B6F', initials: 'AR' },
-  ];
+  const brands = BRANDS;
 
   const featured = brands.slice(0, 10);
 
@@ -122,17 +95,11 @@ export default function Brands() {
               >
                 <Link to={`/catalog?brand=${encodeURIComponent(b.name)}`} style={{ textDecoration:'none' }}>
                   <div style={{
-                    background:C.card, border:`1px solid ${C.border}`, borderRadius:18, padding:'32px 16px',
+                    background:C.card, border:`1px solid ${C.border}`, borderRadius:18, padding:'34px 16px',
                     boxShadow:C.shadow, textAlign:'center', transition:'all 0.3s', height:'100%'
                   }}>
-                    <div style={{
-                      width:64, height:64, margin:'0 auto 16px', borderRadius:16,
-                      background:`linear-gradient(135deg, ${b.color}, ${b.color}CC)`,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize:22, color:'#fff',
-                      boxShadow:`0 6px 20px ${b.color}55`, letterSpacing:'-0.02em'
-                    }}>
-                      {b.initials}
+                    <div style={{ margin:'0 auto 14px', display:'flex', alignItems:'center', justifyContent:'center', minHeight:40 }}>
+                      <BrandLogo brand={b} height={isMobile ? 30 : 36} />
                     </div>
                     <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:16, color:C.text }}>{b.name}</div>
                     <div style={{ fontSize:12, color:C.text3, marginTop:6, fontWeight:600 }}>
@@ -170,12 +137,7 @@ export default function Brands() {
                     display:'flex', alignItems:'center', gap:10, background:C.bg, border:`1px solid ${C.border}`,
                     borderRadius:12, padding:'10px 18px', transition:'all 0.25s', cursor:'pointer'
                   }}>
-                    <span style={{
-                      width:28, height:28, flexShrink:0, borderRadius:8,
-                      background:`linear-gradient(135deg, ${b.color}, ${b.color}CC)`,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize:10, color:'#fff'
-                    }}>{b.initials}</span>
+                    <BrandLogo brand={b} height={20} width={24} style={{ flexShrink:0, margin:0 }} />
                     <span style={{ fontFamily:"'Outfit',sans-serif", fontWeight:700, fontSize:14, color:C.text }}>{b.name}</span>
                   </div>
                 </Link>

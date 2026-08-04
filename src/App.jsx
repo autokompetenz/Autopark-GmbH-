@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore, useLangStore } from './store/index';
 import { t } from './utils/i18n';
@@ -7,40 +7,61 @@ import Toast from './components/Toast';
 import Chatbot from './components/Chatbot';
 import ClientBottomNav, { useClientBottomNavPadding } from './components/ClientBottomNav';
 
-// Pages
-import Home         from './pages/Home';
-import Catalog      from './pages/Catalog';
-import CarDetails   from './pages/CarDetails';
-import Simulation   from './pages/Simulation';
-import Cart         from './pages/Cart';
-import Track        from './pages/Track';
-import OrderConfirm from './pages/OrderConfirm';
-import Orders       from './pages/Orders';
-import Dashboard    from './pages/Dashboard';
-import Profile      from './pages/Profile';
-import Login        from './pages/Login';
-import Register     from './pages/Register';
-import Legal        from './pages/Legal';
-import Warranty     from './pages/Warranty';
-import Insurance    from './pages/Insurance';
-import CampingCar   from './pages/CampingCar';
-import Reviews      from './pages/Reviews';
-import Sell         from './pages/Sell';
-import Contact      from './pages/Contact';
-import Faq          from './pages/Faq';
-import About        from './pages/About';
-import Brands       from './pages/Brands';
-import Delivery     from './pages/Delivery';
-import Maintenance  from './pages/Maintenance';
+// Pages (code-split, chargées à la demande)
+const Home         = lazy(() => import('./pages/Home'));
+const Catalog      = lazy(() => import('./pages/Catalog'));
+const CarDetails   = lazy(() => import('./pages/CarDetails'));
+const Simulation   = lazy(() => import('./pages/Simulation'));
+const Cart         = lazy(() => import('./pages/Cart'));
+const Track        = lazy(() => import('./pages/Track'));
+const OrderConfirm = lazy(() => import('./pages/OrderConfirm'));
+const Orders       = lazy(() => import('./pages/Orders'));
+const Dashboard    = lazy(() => import('./pages/Dashboard'));
+const Profile      = lazy(() => import('./pages/Profile'));
+const Login        = lazy(() => import('./pages/Login'));
+const Register     = lazy(() => import('./pages/Register'));
+const Legal        = lazy(() => import('./pages/Legal'));
+const Warranty     = lazy(() => import('./pages/Warranty'));
+const Insurance    = lazy(() => import('./pages/Insurance'));
+const CampingCar   = lazy(() => import('./pages/CampingCar'));
+const Reviews      = lazy(() => import('./pages/Reviews'));
+const Sell         = lazy(() => import('./pages/Sell'));
+const Contact      = lazy(() => import('./pages/Contact'));
+const Faq          = lazy(() => import('./pages/Faq'));
+const About        = lazy(() => import('./pages/About'));
+const Brands       = lazy(() => import('./pages/Brands'));
+const Delivery     = lazy(() => import('./pages/Delivery'));
+const Maintenance  = lazy(() => import('./pages/Maintenance'));
 
 // Admin
-import AdminLayout      from './pages/admin/AdminLayout';
-import AdminDashboard   from './pages/admin/AdminDashboard';
-import AdminOrders      from './pages/admin/AdminOrders';
-import AdminOrderDetail from './pages/admin/AdminOrderDetail';
-import AdminCars        from './pages/admin/AdminCars';
-import AdminCarForm     from './pages/admin/AdminCarForm';
-import AdminClients     from './pages/admin/AdminClients';
+const AdminLayout      = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminDashboard   = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminOrders      = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
+const AdminCars        = lazy(() => import('./pages/admin/AdminCars'));
+const AdminCarForm     = lazy(() => import('./pages/admin/AdminCarForm'));
+const AdminClients     = lazy(() => import('./pages/admin/AdminClients'));
+
+function RouteFallback() {
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#0a0a0a',
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{
+          width: 40, height: 40, margin: '0 auto 16px', borderRadius: '50%',
+          border: '3px solid rgba(19,40,83,0.2)', borderTopColor: '#132853',
+          animation: 'autopark-spin 0.8s linear infinite',
+        }} />
+        <div style={{ fontFamily: "'Outfit',sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+          Autopark GmbH
+        </div>
+      </div>
+      <style>{`@keyframes autopark-spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 function RequireAuth({ children }) {
   const { isAuthenticated } = useAuthStore();
@@ -81,7 +102,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Toast />
-      <Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
         {/* Public */}
         <Route path="/"          element={<MainLayout><Home /></MainLayout>} />
         <Route path="/catalog"   element={<MainLayout><Catalog /></MainLayout>} />
@@ -144,8 +166,9 @@ export default function App() {
               </div>
             </div>
           </MainLayout>
-        } />
+        }         />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

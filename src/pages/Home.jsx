@@ -6,9 +6,11 @@ import { formatEuro } from '../utils/helpers';
 import { useLangStore, useThemeStore } from '../store';
 import { t } from '../utils/i18n';
 import CarCard from '../components/CarCard';
+import BrandLogo from '../components/BrandLogo';
 import { useBreakpoint } from '../hooks/useBreakpoint';
 import { ALL_REVIEWS } from '../utils/reviews';
 import { CATEGORIES, CAT_LABELS, CATEGORY_ICONS } from '../utils/categories';
+import { HOME_BRANDS } from '../utils/brands';
 
 const SERVICES = [
   { icon:'🚗', fr:'Voitures Neuves',       en:'New Cars',           de:'Neuwagen',          es:'Coches Nuevos',       it:'Auto Nuove',         pt:'Carros Novos',       tag:'2024 Models',
@@ -1012,20 +1014,7 @@ export default function Home() {
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(3,1fr)' : isTablet ? 'repeat(4,1fr)' : 'repeat(6,1fr)', gap: isMobile ? 10 : 16 }}>
-            {[
-              { name:'BMW', color:'#0066B1', initials:'BM' },
-              { name:'Mercedes', color:'#0A1E2E', initials:'MB' },
-              { name:'Audi', color:'#BB0A30', initials:'AU' },
-              { name:'Volkswagen', color:'#1A1A1A', initials:'VW' },
-              { name:'Porsche', color:'#B12B28', initials:'PO' },
-              { name:'Toyota', color:'#EB0A1E', initials:'TO' },
-              { name:'Honda', color:'#CC0000', initials:'HO' },
-              { name:'Hyundai', color:'#002C5F', initials:'HY' },
-              { name:'Kia', color:'#BB162B', initials:'KI' },
-              { name:'Ford', color:'#003478', initials:'FO' },
-              { name:'Renault', color:'#FFC300', initials:'RE' },
-              { name:'Tesla', color:'#CC0000', initials:'TE' },
-            ].map((b, i) => (
+            {HOME_BRANDS.map((b, i) => (
               <motion.div key={i} initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.4, delay:(i%6)*0.05 }}>
                 <Link to={`/catalog?brand=${encodeURIComponent(b.name)}`} style={{ textDecoration:'none' }}>
                   <div style={{
@@ -1035,13 +1024,8 @@ export default function Home() {
                   }}
                     onMouseOver={e => { e.currentTarget.style.borderColor='rgba(19,40,83,0.2)'; e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.transform='translateY(-3px)'; }}
                     onMouseOut={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='translateY(0)'; }}>
-                    <div style={{
-                      width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, margin:'0 auto 10px', borderRadius:12,
-                      background:`linear-gradient(135deg, ${b.color}, ${b.color}CC)`,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize: isMobile ? 13 : 17, color:'#fff',
-                    }}>
-                      {b.initials}
+                    <div style={{ margin:'0 auto 10px', display:'flex', alignItems:'center', justifyContent:'center', minHeight: isMobile ? 26 : 34 }}>
+                      <BrandLogo brand={b} height={isMobile ? 24 : 32} />
                     </div>
                     <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:600, fontSize: isMobile ? 12 : 14, color:'var(--text)', lineHeight:1.2 }}>{b.name}</div>
                   </div>

@@ -32,18 +32,61 @@ export default function Sell() {
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+  const WA_NUMBER = '491745232945';
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name || !form.phone) {
       addToast(t({ fr:'Veuillez indiquer votre nom et votre téléphone', en:'Please provide your name and phone', de:'Bitte geben Sie Namen und Telefon an', es:'Indique su nombre y teléfono', it:'Indicare nome e telefono', pt:'Indique o seu nome e telefone' }), 'error');
       return;
     }
+
+    const waText = [
+      `🚗 *Demande d'estimation — Autopark GmbH*`,
+      ``,
+      `Nom : ${form.name}`,
+      `Téléphone : ${form.phone}`,
+      `Email : ${form.email || '—'}`,
+      ``,
+      `Véhicule : ${form.make} ${form.model}`,
+      `Année : ${form.year || '—'}`,
+      `Kilométrage : ${form.mileage ? form.mileage + ' km' : '—'}`,
+      `Carburant : ${form.fuel}`,
+      `État : ${form.condition}`,
+      `Prix souhaité : ${form.price ? form.price + ' €' : '—'}`,
+      form.notes ? `Commentaires : ${form.notes}` : '',
+    ].filter(Boolean).join('\n');
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waText)}`, '_blank');
+
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      addToast(t({ fr:'Demande envoyée ! Notre équipe vous contactera rapidement.', en:'Request sent! Our team will contact you shortly.', de:'Anfrage gesendet! Unser Team meldet sich schnellstmöglich.', es:'¡Solicitud enviada! Nuestro equipo se pondrá en contacto.', it:'Richiesta inviata! Il nostro team vi contatterà presto.', pt:'Pedido enviado! A nossa equipa entrará em contacto.' }), 'success');
-      setForm({ name: '', email: '', phone: '', make: '', model: '', year: '', mileage: '', fuel: 'Essence', price: '', condition: 'Bon état', notes: '' });
-    }, 700);
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'sell',
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        make: form.make,
+        model: form.model,
+        year: form.year,
+        mileage: form.mileage,
+        fuel: form.fuel,
+        price: form.price,
+        condition: form.condition,
+        notes: form.notes,
+      }),
+    })
+      .then((res) => {
+        setSubmitting(false);
+        if (!res.ok) throw new Error();
+        addToast(t({ fr:'Demande envoyée ! Notre équipe vous contactera rapidement.', en:'Request sent! Our team will contact you shortly.', de:'Anfrage gesendet! Unser Team meldet sich schnellstmöglich.', es:'¡Solicitud enviada! Nuestro equipo se pondrá en contacto.', it:'Richiesta inviata! Il nostro team vi contatterà presto.', pt:'Pedido enviado! A nossa equipa entrará em contacto.' }), 'success');
+        setForm({ name: '', email: '', phone: '', make: '', model: '', year: '', mileage: '', fuel: 'Essence', price: '', condition: 'Bon état', notes: '' });
+      })
+      .catch(() => {
+        setSubmitting(false);
+        addToast(t({ fr:'Envoi impossible, votre message WhatsApp s\'est ouvert — finalisez-le pour nous joindre.', en:'Sending failed, your WhatsApp message opened — complete it to reach us.', de:'Senden fehlgeschlagen — Ihre WhatsApp-Nachricht wurde geöffnet, bitte abschließen.', es:'No se pudo enviar, su mensaje de WhatsApp se abrió — complételo para contactarnos.', it:'Invio non riuscito, il messaggio WhatsApp si è aperto — completatelo per contattarci.', pt:'Envio falhado, a sua mensagem WhatsApp abriu — conclua-a para nos contactar.' }), 'error');
+      });
   };
 
   const steps = [
