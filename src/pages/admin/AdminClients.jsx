@@ -6,10 +6,32 @@ import { Loader } from '../../components/UI';
 export default function AdminClients() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
-  useEffect(() => {
-    adminAPI.clients().then(r => { setClients(r.data.clients); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data } = await adminAPI.clients();
+      setClients(data.clients);
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleDelete = async (client) => {
+    if (!window.confirm(`Supprimer définitivement le client ${client.firstName} ${client.lastName} (${client.email}) ?\nSes commandes et son panier seront également supprimés.`)) return;
+    setDeletingId(client.id);
+    try {
+      await adminAPI.deleteClient(client.id);
+      setClients(prev => prev.filter(c => c.id !== client.id));
+    } catch (e) {
+      console.error(e);
+      alert(e.response?.data?.error || 'Erreur lors de la suppression du client');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (loading) return <div style={{ padding:40 }}><Loader text="Chargement des clients..." /></div>;
 
@@ -27,7 +49,7 @@ export default function AdminClients() {
           <table style={{ width:'100%', borderCollapse:'collapse', fontSize:14 }}>
             <thead>
               <tr style={{ borderBottom:'1px solid var(--border)' }}>
-                {['Client','Contact','Salaire','Commandes','Total dépensé','Inscrit le'].map(h => (
+                {['Client','Contact','Salaire','Commandes','Total dépensé','Inscrit le',''].map(h => (
                   <th key={h} style={{ textAlign:'left', fontSize:11, fontWeight:800, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--text-3)', padding:'14px 20px', background:'var(--bg-card2)' }}>{h}</th>
                 ))}
               </tr>
@@ -79,10 +101,28 @@ export default function AdminClients() {
                   <td style={{ padding:'14px 20px', fontSize:13, color:'var(--text-2)', fontWeight:500 }}>
                     {formatDate(client.createdAt)}
                   </td>
+                  <td style={{ padding:'14px 20px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(client)}
+                      disabled={deletingId === client.id}
+                      style={{
+                        fontSize:12, padding:'8px 14px', letterSpacing:'0.05em',
+                        border:'1px solid rgba(220,38,38,0.35)', borderRadius:8,
+                        background:'rgba(220,38,38,0.08)', color:'#DC2626',
+                        cursor:'pointer', fontFamily:"'Outfit',sans-serif", fontWeight:700,
+                        opacity: deletingId === client.id ? 0.5 : 1,
+                        transition:'all 0.2s var(--ease)',
+                      }}
+                      onMouseOver={e => { if (deletingId !== client.id) { e.currentTarget.style.background = 'rgba(220,38,38,0.16)'; } }}
+                      onMouseOut={e => { e.currentTarget.style.background = 'rgba(220,38,38,0.08)'; }}>
+                      {deletingId === client.id ? 'Suppression…' : 'Supprimer'}
+                    </button>
+                  </td>
                 </tr>
               ))}
               {clients.length === 0 && (
-                <tr><td colSpan={6} style={{ padding:'48px', textAlign:'center', color:'var(--text-3)', fontSize:15, fontWeight:500 }}>Aucun client trouvé</td></tr>
+                <tr><td colSpan={7} style={{ padding:'48px', textAlign:'center', color:'var(--text-3)', fontSize:15, fontWeight:500 }}>Aucun client trouvé</td></tr>
               )}
             </tbody>
           </table>

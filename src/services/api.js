@@ -65,14 +65,16 @@ export const orderAPI = {
   getAll:         (p)    => api.get('/orders', { params: p }),
   getAdminDetail: (id)   => api.get(`/orders/${id}`),
   updateStatus:   (id,d) => api.patch(`/orders/${id}`, d),
+  remove:         (id)   => api.delete(`/orders/${id}`),
 };
 export const simAPI = {
   simulate: (salary) => api.get('/simulation', { params: { salary } }),
 };
 export const adminAPI = {
-  stats:   () => api.get('/admin/stats'),
-  clients: () => api.get('/admin/clients'),
-  getCars: () => api.get('/admin/cars'),
+  stats:        () => api.get('/admin/stats'),
+  clients:      () => api.get('/admin/clients'),
+  getCars:      () => api.get('/admin/cars'),
+  deleteClient: (id) => api.delete(`/admin/clients/${id}`),
 };
 export const userAPI = {
   updateProfile:  (d) => api.put('/user/profile', d),

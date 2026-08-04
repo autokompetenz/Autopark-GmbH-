@@ -1096,6 +1096,22 @@ app.patch('/api/orders/:id', authenticateToken, requireAdmin, async (req, res) =
   }
 });
 
+// Admin: delete order (cascades items & tracking via schema)
+app.delete('/api/orders/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const existing = await prisma.order.findUnique({ where: { id: orderId } });
+    if (!existing) {
+      return res.status(404).json({ error: 'Commande non trouvée' });
+    }
+    await prisma.order.delete({ where: { id: orderId } });
+    res.json({ success: true, id: orderId });
+  } catch (e) {
+    console.error('DELETE /api/orders/:id ERROR:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // User Routes
 app.put('/api/user/profile', authenticateToken, async (req, res) => {
   try {
@@ -1219,7 +1235,7 @@ app.get('/api/admin/clients', authenticateToken, requireAdmin, async (req, res) 
       ];
     }
 
-    const [clients, total] = await Promise.all([
+    const [clients, total, spentAgg] = await Promise.all([
       prisma.user.findMany({
         where,
         select: {
@@ -1231,10 +1247,53 @@ app.get('/api/admin/clients', authenticateToken, requireAdmin, async (req, res) 
         take, skip,
       }),
       prisma.user.count({ where }),
+      prisma.order.groupBy({ by:['userId'], _sum: { totalPrice: true } }),
     ]);
 
-    res.json({ clients, total, page: parseInt(page), limit: take });
+    const spentMap = new Map(spentAgg.map(o => [o.userId, o._sum.totalPrice || 0]));
+    const result = clients.map(c => ({
+      ...c,
+      orderCount: c._count.orders,
+      totalSpent: spentMap.get(c.id) || 0,
+      _count: undefined,
+    }));
+
+    res.json({ clients: result, total, page: parseInt(page), limit: take });
   } catch (e) {
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Admin: delete a client (removes their orders, cart & tracking in a transaction)
+app.delete('/api/admin/clients/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const target = await prisma.user.findUnique({ where: { id: userId } });
+    if (!target) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+    if (target.role === 'ADMIN') {
+      return res.status(400).json({ error: 'Impossible de supprimer un administrateur' });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const orderIds = (await tx.order.findMany({
+        where: { userId },
+        select: { id: true },
+      })).map(o => o.id);
+
+      if (orderIds.length > 0) {
+        await tx.orderItem.deleteMany({ where: { orderId: { in: orderIds } } });
+        await tx.orderTracking.deleteMany({ where: { orderId: { in: orderIds } } });
+        await tx.order.deleteMany({ where: { id: { in: orderIds } } });
+      }
+      await tx.cart.deleteMany({ where: { userId } });
+      await tx.user.delete({ where: { id: userId } });
+    });
+
+    res.json({ success: true, id: userId });
+  } catch (e) {
+    console.error('DELETE /api/admin/clients/:id ERROR:', e);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

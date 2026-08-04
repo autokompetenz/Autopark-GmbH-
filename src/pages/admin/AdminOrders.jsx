@@ -12,6 +12,7 @@ export default function AdminOrders() {
   const [statusCounts, setStatusCounts] = useState([]);
   const [activeTab, setActiveTab] = useState('');
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   const fetchOrders = async (status) => {
     setLoading(true);
@@ -29,6 +30,20 @@ export default function AdminOrders() {
   const tabs = [{ id:'', label:'Toutes' }, ...Object.entries(STATUS_LABELS).map(([id,label]) => ({ id, label }))];
 
   const handleTab = (id) => { setActiveTab(id); fetchOrders(id); };
+
+  const handleDelete = async (order) => {
+    if (!window.confirm(`Supprimer définitivement la commande ${order.orderNumber} ?\nCette action est irréversible.`)) return;
+    setDeletingId(order.id);
+    try {
+      await orderAPI.remove(order.id);
+      setOrders(prev => prev.filter(o => o.id !== order.id));
+    } catch (e) {
+      console.error(e);
+      alert('Erreur lors de la suppression de la commande');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div style={{ padding:'clamp(24px,5vw,48px) clamp(16px,4vw,44px) 60px', minHeight:'100vh', background:'var(--bg)' }}>
@@ -102,7 +117,25 @@ export default function AdminOrders() {
                     </td>
                     <td style={{ padding:'14px 20px' }}><StatusBadge status={order.status} /></td>
                     <td style={{ padding:'14px 20px' }}>
-                      <Link to={`/admin/orders/${order.id}`} className="btn-gold" style={{ fontSize:12, padding:'10px 18px', letterSpacing:'0.05em' }}>Gérer →</Link>
+                      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                        <Link to={`/admin/orders/${order.id}`} className="btn-gold" style={{ fontSize:12, padding:'10px 18px', letterSpacing:'0.05em' }}>Gérer →</Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(order)}
+                          disabled={deletingId === order.id}
+                          style={{
+                            fontSize:12, padding:'10px 14px', letterSpacing:'0.05em',
+                            border:'1px solid rgba(220,38,38,0.35)', borderRadius:8,
+                            background:'rgba(220,38,38,0.08)', color:'#DC2626',
+                            cursor:'pointer', fontFamily:"'Outfit',sans-serif", fontWeight:700,
+                            opacity: deletingId === order.id ? 0.5 : 1,
+                            transition:'all 0.2s var(--ease)',
+                          }}
+                          onMouseOver={e => { if (deletingId !== order.id) { e.currentTarget.style.background = 'rgba(220,38,38,0.16)'; } }}
+                          onMouseOut={e => { e.currentTarget.style.background = 'rgba(220,38,38,0.08)'; }}>
+                          {deletingId === order.id ? 'Suppression…' : 'Supprimer'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
