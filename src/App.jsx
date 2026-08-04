@@ -5,6 +5,7 @@ import { t } from './utils/i18n';
 import Navbar from './components/Navbar';
 import Toast from './components/Toast';
 import Chatbot from './components/Chatbot';
+import PendingOrderReminder from './components/PendingOrderReminder';
 import ClientBottomNav, { useClientBottomNavPadding } from './components/ClientBottomNav';
 
 // Pages (code-split, chargées à la demande)
@@ -121,6 +122,7 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Toast />
+      <PendingOrderReminder />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         {/* Public */}

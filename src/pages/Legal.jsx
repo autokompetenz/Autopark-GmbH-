@@ -79,6 +79,19 @@ Capital social : 230.000,00 €</p>
 <p>Vercel Inc., São Francisco, EUA. Base de dados: Supabase Inc., Singapura.</p>
 <h2>Lei aplicável</h2>
 <p>Direito alemão (TMG). Tribunais de Naumburg.</p>` },
+    ro: { title: 'Informații Legale', content: `
+<h2>Editor</h2>
+<p><strong>Autopark GmbH</strong><br/>Franz-Julius-Haenel-Str. 3, 06618 Naumburg, Germania<br/>Nr. registru: DEW1215.HRB207153 — Capital social: 230.000,00 €</p>
+<h2>Formă juridică</h2>
+<p>Gesellschaft mit beschränkter Haftung (GmbH) — societate cu răspundere limitată de drept german.</p>
+<h2>Director general</h2>
+<p>Ronny Reinsberger, Geschäftsführer.</p>
+<h2>Activitate</h2>
+<p>Comerț cu ridicata și cu amănuntul de piese și accesorii auto. Comerț cu vehicule noi și second-hand. Închiriere de vehicule.</p>
+<h2>Găzduire</h2>
+<p>Vercel Inc., San Francisco, SUA. Bază de date: Supabase Inc., Singapore.</p>
+<h2>Drept aplicabil</h2>
+<p>Dreptul german (TMG). Instanțe competente: Naumburg.</p>` },
   },
 
   '/politique-confidentialite': {
@@ -132,6 +145,17 @@ Capital social : 230.000,00 €</p>
 <ul><li>Nome, email, telefone, endereço</li><li>Salário mensal (simulação)</li><li>Histórico de pedidos</li></ul>
 <h2>3. Os seus direitos (RGPD)</h2>
 <p>Acesso, retificação, eliminação, portabilidade, oposição. Contacto: info@autopark-gmbh.com</p>` },
+    ro: { title: 'Politica de Confidențialitate', content: `
+<h2>1. Operatorul datelor</h2>
+<p>Autopark GmbH — info@autopark-gmbh.com</p>
+<h2>2. Date colectate</h2>
+<ul><li>Nume, prenume, email, telefon, adresă</li><li>Salariu lunar (simulare finanțare)</li><li>Istoricul comenzilor</li></ul>
+<h2>3. Baza legală (GDPR)</h2>
+<ul><li>Executarea contractului — Art. 6(1)(b)</li><li>Consimțământ — Art. 6(1)(a)</li><li>Interes legitim — Art. 6(1)(f)</li></ul>
+<h2>4. Drepturile dvs.</h2>
+<p>Acces, rectificare, ștergere, portabilitate, opoziție. Contact: info@autopark-gmbh.com</p>
+<h2>5. Securitate</h2>
+<p>Parole criptate (bcrypt), JWT cu expirare, conexiuni HTTPS.</p>` },
   },
 
   '/cgv': {
@@ -185,6 +209,17 @@ Capital social : 230.000,00 €</p>
 <ul><li>Pagamento integral: 5% desconto</li><li>Entrada 25%: saldo na entrega</li><li>Prestações: 60 meses a 6%/ano</li></ul>
 <h2>Artigo 3 — Desistência</h2>
 <p>14 dias a partir da receção (Diretiva 2011/83/UE).</p>` },
+    ro: { title: 'Condiții Generale de Vânzare', content: `
+<h2>Articolul 1 — Obiect</h2>
+<p>Prezentele CGV reglementează achizițiile de la Autopark GmbH.</p>
+<h2>Articolul 2 — Preț</h2>
+<p>Prețuri în Euro (€) TVA inclus. Modificabile oricând.</p>
+<h2>Articolul 3 — Plată</h2>
+<ul><li><strong>Integral</strong>: reducere de 5%</li><li><strong>Acont 25%</strong>: restul la livrare</li><li><strong>Rate lunare</strong>: 60 de luni la 6%/an</li></ul>
+<h2>Articolul 4 — Retractare</h2>
+<p>14 zile de la primire (Directiva 2011/83/UE).</p>
+<h2>Articolul 5 — Drept aplicabil</h2>
+<p>Dreptul german. Instanțe: Osnabrück.</p>` },
   },
 
   '/cookies': {
@@ -252,10 +287,23 @@ Capital social : 230.000,00 €</p>
 </ul>
 <h2>Gestão</h2>
 <p>Através do banner na primeira visita ou configurações do browser.</p>` },
+    ro: { title: 'Politica privind Cookie-urile', content: `
+<h2>Cookie-uri utilizate</h2>
+<ul>
+<li><code>ak_token</code> — Autentificare JWT (sesiune)</li>
+<li><code>ak_user</code> — Date utilizator în cache (sesiune)</li>
+<li><code>ak_lang</code> — Preferință de limbă (1 an)</li>
+<li><code>ak_theme</code> — Preferință de temă (1 an)</li>
+<li><code>ak_cookies</code> — Consimțământ cookie (1 an)</li>
+</ul>
+<h2>Gestionare</h2>
+<p>Prin banner la prima vizită sau prin setările browserului.</p>
+<h2>Contact</h2>
+<p>info@autopark-gmbh.com</p>` },
   },
 };
 
-const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', es:'🇪🇸 ES', it:'🇮🇹 IT', pt:'🇵🇹 PT' };
+const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', es:'🇪🇸 ES', it:'🇮🇹 IT', pt:'🇵🇹 PT', ro:'🇷🇴 RO' };
 
 export default function Legal() {
   const { lang, setLang } = useLangStore();
@@ -284,7 +332,7 @@ export default function Legal() {
       <div style={{ padding: isMobile ? '28px 5% 32px' : '56px 6% 44px', borderBottom:'1px solid var(--border)', background:'var(--bg-card2)' }}>
         <div style={{ maxWidth:820, margin:'0 auto' }}>
           <Link to="/" style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:12, color:'var(--text-3)', textDecoration:'none', marginBottom:20, letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600 }}>
-            ← {lang==='fr'?'Retour':lang==='en'?'Back':lang==='de'?'Zurück':lang==='es'?'Volver':lang==='it'?'Indietro':'Voltar'}
+            ← {lang==='fr'?'Retour':lang==='en'?'Back':lang==='de'?'Zurück':lang==='es'?'Volver':lang==='it'?'Indietro':lang==='ro'?'Înapoi':'Voltar'}
           </Link>
           <h1 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize:'clamp(28px,5vw,60px)', color:'var(--text)', letterSpacing:'-0.02em', marginBottom:20 }}>
             {content.title}
