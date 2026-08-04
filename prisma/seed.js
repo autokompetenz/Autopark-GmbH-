@@ -54,6 +54,18 @@ async function main() {
     });
   }
 
+  // Default bank details (editable in admin)
+  await prisma.bankInfo.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      iban: '',
+      bic: '',
+      beneficiary: 'AUTOPARK GMBH',
+    },
+  });
+
   console.log('✅ Admin:  info@autopark-gmbh.com / password');
   console.log('✅ Client: client@autopark-gmbh.com / password');
   console.log('✅ 10 véhicules créés');

@@ -41,6 +41,7 @@ const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
 const AdminCars        = lazy(() => import('./pages/admin/AdminCars'));
 const AdminCarForm     = lazy(() => import('./pages/admin/AdminCarForm'));
 const AdminClients     = lazy(() => import('./pages/admin/AdminClients'));
+const AdminSettings    = lazy(() => import('./pages/admin/AdminSettings'));
 
 function RouteFallback() {
   return (
@@ -149,6 +150,7 @@ export default function App() {
           <Route path="cars/new"  element={<AdminCarForm />} />
           <Route path="cars/:id/edit" element={<AdminCarForm />} />
           <Route path="clients"   element={<AdminClients />} />
+          <Route path="settings"  element={<AdminSettings />} />
         </Route>
 
         {/* 404 */}

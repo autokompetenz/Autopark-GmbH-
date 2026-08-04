@@ -6,7 +6,7 @@ const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
 const { prisma } = require('../lib/prisma.js');
 const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendLeadEmail } = require('../lib/mailer.js');
-const { calculateMonthlyPayment } = require('../lib/helpers.js');
+const { calculateMonthlyPayment, generatePaymentReference } = require('../lib/helpers.js');
 
 // Initialize Express app
 const app = express();
@@ -872,6 +872,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
           paymentType, 
           shippingAddress, 
           notes: notes || null, 
+          paymentReference: generatePaymentReference(req.user, cartItems[0]?.car, orderNumber),
           ...totals 
         },
       });
@@ -903,12 +904,13 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
     res.status(201).json({ success: true, orderNumber: order.orderNumber, order });
 
     // Send order confirmation email (non-blocking)
-    sendOrderConfirmationEmail({
+    getBankInfo().then(bank => sendOrderConfirmationEmail({
       email: req.user.email,
       firstName: req.user.firstName,
       order: { ...order, createdAt: order.createdAt || new Date() },
       items: cartItems.map(i => ({ car: i.car, unitPrice: i.car.price, quantity: i.quantity })),
-    }).catch(err => console.error('Order confirmation email error:', err));
+      bank,
+    }).catch(err => console.error('Order confirmation email error:', err)));
   } catch (e) {
     console.error('Create order error:', e);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -1294,6 +1296,63 @@ app.delete('/api/admin/clients/:id', authenticateToken, requireAdmin, async (req
     res.json({ success: true, id: userId });
   } catch (e) {
     console.error('DELETE /api/admin/clients/:id ERROR:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Bank settings helper
+async function getBankInfo() {
+  const bank = await prisma.bankInfo.findFirst();
+  return bank || { iban: '', bic: '', beneficiary: 'AUTOPARK GMBH' };
+}
+
+// Public bank details (shown on order confirmation for wire transfer)
+app.get('/api/bank', async (req, res) => {
+  try {
+    res.json({ bank: await getBankInfo() });
+  } catch (e) {
+    console.error('GET /api/bank error:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Admin: read bank settings
+app.get('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    res.json({ bank: await getBankInfo() });
+  } catch (e) {
+    console.error('GET /api/admin/bank error:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Admin: update bank settings (single row, upsert)
+app.put('/api/admin/bank', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { iban, bic, beneficiary } = req.body || {};
+    if (iban === undefined && bic === undefined && beneficiary === undefined) {
+      return res.status(400).json({ error: 'Aucune donnée à mettre à jour' });
+    }
+    const existing = await prisma.bankInfo.findFirst();
+    const bank = existing
+      ? await prisma.bankInfo.update({
+          where: { id: existing.id },
+          data: {
+            iban: iban ?? existing.iban,
+            bic: bic ?? existing.bic,
+            beneficiary: beneficiary ?? existing.beneficiary,
+          },
+        })
+      : await prisma.bankInfo.create({
+          data: {
+            iban: iban || '',
+            bic: bic || '',
+            beneficiary: beneficiary || 'AUTOPARK GMBH',
+          },
+        });
+    res.json({ success: true, bank });
+  } catch (e) {
+    console.error('PUT /api/admin/bank error:', e);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

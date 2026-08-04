@@ -9,6 +9,7 @@ const links = [
   { to: '/admin/cars', icon: '🚗', label: 'Véhicules' },
   { to: '/admin/cars/new', icon: '＋', label: 'Ajouter un véhicule' },
   { to: '/admin/clients', icon: '👥', label: 'Clients' },
+  { to: '/admin/settings', icon: '💳', label: 'Paiement' },
 ];
 
 export default function AdminSidebar({ mobileOpen = false, onClose }) {

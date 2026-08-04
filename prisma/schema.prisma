@@ -129,6 +129,7 @@ model Order {
   status          OrderStatus @default(pending)
   notes           String?     @db.Text
   shippingAddress String?
+  paymentReference String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -172,4 +173,14 @@ model Cart {
   car  Car  @relation(fields: [carId],  references: [id])
 
   @@unique([userId, carId])
+}
+
+model BankInfo {
+  id          Int      @id @default(autoincrement())
+  iban        String   @default("")
+  bic         String   @default("")
+  beneficiary String   @default("AUTOPARK GMBH")
+  updatedAt   DateTime @updatedAt
+
+  @@map("bank_info")
 }

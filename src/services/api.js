@@ -67,6 +67,11 @@ export const orderAPI = {
   updateStatus:   (id,d) => api.patch(`/orders/${id}`, d),
   remove:         (id)   => api.delete(`/orders/${id}`),
 };
+export const bankAPI = {
+  get:     ()  => api.get('/bank'),
+  getAdmin:()  => api.get('/admin/bank'),
+  update:  (d) => api.put('/admin/bank', d),
+};
 export const simAPI = {
   simulate: (salary) => api.get('/simulation', { params: { salary } }),
 };
