@@ -106,7 +106,7 @@ export default function AdminCars() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Photo', 'Véhicule', 'Année', 'Prix', 'Stock', 'Catégorie', 'Statut', 'Actions'].map(h => (
+                  {['Photo', 'Véhicule', 'Année', 'Prix', 'Catégorie', 'Statut', 'Actions'].map(h => (
                     <th key={h} style={{ textAlign: 'left', fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', padding: '14px 20px', background: 'var(--bg-card2)' }}>{h}</th>
                   ))}
                 </tr>
@@ -141,11 +141,6 @@ export default function AdminCars() {
                     </td>
                     <td style={{ padding: '14px 20px', color: 'var(--text-2)', fontSize: 14, fontWeight: 600 }}>{car.year}</td>
                     <td style={{ padding: '14px 20px', fontWeight: 800, color: 'var(--red)', fontSize: 17, letterSpacing: '-0.01em' }}>{formatEuro(car.price)}</td>
-                    <td style={{ padding: '14px 20px' }}>
-                      <span style={{ fontSize: 14, fontWeight: 800, color: (car.stock ?? 0) > 0 ? 'var(--green)' : '#EF4444', letterSpacing: '0.02em' }}>
-                        {(car.stock ?? 0) > 0 ? `${car.stock} dispo.` : 'Épuisé'}
-                      </span>
-                    </td>
                     <td style={{ padding: '14px 20px', color: 'var(--text-2)', fontSize: 13, fontWeight: 600 }}>{car.category}</td>
                     <td style={{ padding: '14px 20px' }}>
                       <span style={{

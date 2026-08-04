@@ -77,7 +77,6 @@ model Car {
   model          String
   year           Int
   price          Float
-  stock          Int          @default(1)
   description    String?      @db.Text
   fuelType       FuelType
   transmission   Transmission

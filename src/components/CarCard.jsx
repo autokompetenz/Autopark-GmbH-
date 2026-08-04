@@ -28,8 +28,6 @@ export default function CarCard({ car, index = 0 }) {
     } finally { setAdding(false); }
   };
 
-  const isOutOfStock = car.stock === 0;
-
   return (
     <motion.div
       initial={{ opacity:0, y:20 }}
@@ -64,11 +62,6 @@ export default function CarCard({ car, index = 0 }) {
           {car.promotional && (
             <span style={{ background:'rgba(255,140,0,0.9)', backdropFilter:'blur(8px)', color:'#fff', fontSize:9, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', padding:'5px 12px', borderRadius:4 }}>
               {l==='fr'?'Promo':l==='en'?'Sale':l==='de'?'Aktion':l==='es'?'Oferta':l==='it'?'Promo':'Promoção'}
-            </span>
-          )}
-          {isOutOfStock && (
-            <span style={{ background:'rgba(0,0,0,0.7)', backdropFilter:'blur(8px)', color:'rgba(255,255,255,0.8)', fontSize:9, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', padding:'5px 12px', borderRadius:4 }}>
-              {t('out_of_stock', l)}
             </span>
           )}
         </div>
@@ -110,11 +103,11 @@ export default function CarCard({ car, index = 0 }) {
               </div>
             )}
           </div>
-          <button onClick={handleAddToCart} disabled={isOutOfStock||adding}
-            style={{ padding:'10px 18px', borderRadius:8, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:isOutOfStock?'not-allowed':'pointer', border:'1px solid', fontFamily:"'Outfit',sans-serif", transition:'all 0.3s', borderColor:isOutOfStock?'var(--border)':'var(--red)', background:isOutOfStock?'transparent':adding?'rgba(19,40,83,0.08)':'transparent', color:isOutOfStock?'var(--text-3)':adding?'var(--red)':'var(--red)', flexShrink:0 }}
-            onMouseOver={e=>{ if(!isOutOfStock&&!adding) { e.currentTarget.style.background='var(--red)'; e.currentTarget.style.color='#fff'; }}}
-            onMouseOut={e=>{ if(!isOutOfStock&&!adding) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='var(--red)'; }}}>
-            {adding?'...':isOutOfStock?t('out_of_stock',l):'+ '+t('add_to_cart',l).split(' ')[0]}
+          <button onClick={handleAddToCart} disabled={adding}
+            style={{ padding:'10px 18px', borderRadius:8, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', border:'1px solid', fontFamily:"'Outfit',sans-serif", transition:'all 0.3s', borderColor:'var(--red)', background:adding?'rgba(19,40,83,0.08)':'transparent', color:'var(--red)', flexShrink:0 }}
+            onMouseOver={e=>{ if(!adding) { e.currentTarget.style.background='var(--red)'; e.currentTarget.style.color='#fff'; }}}
+            onMouseOut={e=>{ if(!adding) { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='var(--red)'; }}}>
+            {adding?'...':'+ '+t('add_to_cart',l).split(' ')[0]}
           </button>
         </div>
       </div>

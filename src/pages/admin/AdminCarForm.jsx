@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { carAPI } from '../../services/api';
 import { useToastStore } from '../../store';
 
-const EMPTY = { make:'', model:'', year:new Date().getFullYear(), price:'', stock:1, description:'', fuelType:'Essence', transmission:'Automatique', mileage:0, color:'', power:'', category:'Berline', imageUrl:'', imageUrl2:'', imageUrl3:'', imageUrl4:'', imageUrl5:'', imageUrl6:'', imageUrl7:'', imageUrl8:'', imageUrl9:'', imageUrl10:'', imageUrl11:'', imageUrl12:'', imageUrl13:'', imageUrl14:'', imageUrl15:'', imageUrl16:'', imageUrl17:'', imageUrl18:'', imageUrl19:'', imageUrl20:'', minSalary:'', featured:false, promotional:false, isActive:true };
+const EMPTY = { make:'', model:'', year:new Date().getFullYear(), price:'', description:'', fuelType:'Essence', transmission:'Automatique', mileage:0, color:'', power:'', category:'Berline', imageUrl:'', imageUrl2:'', imageUrl3:'', imageUrl4:'', imageUrl5:'', imageUrl6:'', imageUrl7:'', imageUrl8:'', imageUrl9:'', imageUrl10:'', imageUrl11:'', imageUrl12:'', imageUrl13:'', imageUrl14:'', imageUrl15:'', imageUrl16:'', imageUrl17:'', imageUrl18:'', imageUrl19:'', imageUrl20:'', minSalary:'', featured:false, promotional:false, isActive:true };
 
 function Section({ title, children }) {
   return (
@@ -181,7 +181,6 @@ export default function AdminCarForm() {
       if (form.model !== undefined && form.model !== null) formData.append('model', form.model);
       if (form.year !== undefined && form.year !== null) formData.append('year', form.year);
       if (form.price !== undefined && form.price !== null) formData.append('price', form.price);
-      if (form.stock !== undefined && form.stock !== null) formData.append('stock', form.stock);
       if (form.description) formData.append('description', form.description);
       // Always include required fields that have default values
       if (form.fuelType !== undefined && form.fuelType !== null) formData.append('fuelType', form.fuelType);
@@ -254,7 +253,6 @@ export default function AdminCarForm() {
             <Field label="Modèle *" field="model" placeholder="Camry" value={form.model} onChange={set("model")} />
             <Field label="Année *" field="year" type="number" placeholder="2024" value={form.year} onChange={set("year")} />
             <Field label="Prix (€) *" field="price" type="number" placeholder="25000" value={form.price} onChange={set("price")} />
-            <Field label="Stock *" field="stock" type="number" placeholder="3" value={form.stock} onChange={set("stock")} />
           </div>
           <Field label="Description" field="description" rows={4} placeholder="Description détaillée du véhicule..." value={form.description} onChange={set("description")} />
         </Section>

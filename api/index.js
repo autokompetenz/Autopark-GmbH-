@@ -76,7 +76,6 @@ function parseCarFormBody(data) {
     model: data.model,
     year: Number(data.year),
     price,
-    stock: Number(data.stock) || 1,
     description: data.description || null,
     fuelType: data.fuelType,
     transmission: data.transmission,
@@ -660,10 +659,6 @@ app.post('/api/cart', authenticateToken, async (req, res) => {
       console.log('Car not found or inactive');
       return res.status(404).json({ error: 'Voiture non trouvée' });
     }
-    if (car.stock < quantity) {
-      console.log('Insufficient stock:', { stock: car.stock, requested: quantity });
-      return res.status(400).json({ error: 'Stock insuffisant' });
-    }
 
     const existingItem = await prisma.cart.findFirst({
       where: { userId: req.user.id, carId: parseInt(carId) },
@@ -674,10 +669,6 @@ app.post('/api/cart', authenticateToken, async (req, res) => {
     if (existingItem) {
       console.log('Updating existing cart item');
       const newQuantity = existingItem.quantity + quantity;
-      if (car.stock < newQuantity) {
-        console.log('Insufficient stock for update:', { stock: car.stock, newQuantity });
-        return res.status(400).json({ error: 'Stock insuffisant' });
-      }
       const updated = await prisma.cart.update({
         where: { id: existingItem.id },
         data: { quantity: newQuantity, paymentType },
@@ -762,10 +753,6 @@ app.put('/api/cart/:carId', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Article non trouvé dans le panier' });
     }
 
-    if (quantity > cartItem.car.stock) {
-      return res.status(400).json({ error: 'Stock insuffisant' });
-    }
-
     const updated = await prisma.cart.update({
       where: { id: cartItem.id },
       data: { quantity, paymentType },
@@ -846,14 +833,6 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Panier vide' });
     }
 
-    for (const item of cartItems) {
-      if (item.car.stock < item.quantity) {
-        return res.status(400).json({ 
-          error: `Stock insuffisant : ${item.car.make} ${item.car.model}` 
-        });
-      }
-    }
-
     const subtotal = cartItems.reduce((s, i) => s + i.car.price * i.quantity, 0);
     const totals = calculateOrderTotals(subtotal, paymentType);
 
@@ -885,14 +864,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
           unitPrice: i.car.price 
         })),
       });
-      
-      for (const item of cartItems) {
-        await tx.car.update({ 
-          where: { id: item.carId }, 
-          data: { stock: { decrement: item.quantity } } 
-        });
-      }
-      
+
       await tx.orderTracking.create({
         data: { orderId: newOrder.id, status: 'pending', comment: 'Commande reçue' },
       });

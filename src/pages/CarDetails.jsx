@@ -19,10 +19,10 @@ const INFO_TITLE = {
 };
 
 const SPEC_LABELS = {
-  fr: { year:'Année', power:'Puissance', fuel:'Carburant', gear:'Boîte', km:'Kilométrage', color:'Couleur', stock:'Disponibilité', new:'Neuf', available:'disponible(s)', unavailable:'Épuisé' },
-  en: { year:'Year', power:'Power', fuel:'Fuel', gear:'Gearbox', km:'Mileage', color:'Colour', stock:'Availability', new:'New', available:'available', unavailable:'Out of stock' },
-  de: { year:'Baujahr', power:'Leistung', fuel:'Kraftstoff', gear:'Getriebe', km:'Kilometerstand', color:'Farbe', stock:'Verfügbarkeit', new:'Neu', available:'verfügbar', unavailable:'Ausverkauft' },
-  ar: { year:'السنة', power:'القوة', fuel:'الوقود', gear:'ناقل الحركة', km:'عداد المسافة', color:'اللون', stock:'التوافر', new:'جديد', available:'متوفر', unavailable:'غير متوفر' },
+  fr: { year:'Année', power:'Puissance', fuel:'Carburant', gear:'Boîte', km:'Kilométrage', color:'Couleur', new:'Neuf' },
+  en: { year:'Year', power:'Power', fuel:'Fuel', gear:'Gearbox', km:'Mileage', color:'Colour', new:'New' },
+  de: { year:'Baujahr', power:'Leistung', fuel:'Kraftstoff', gear:'Getriebe', km:'Kilometerstand', color:'Farbe', new:'Neu' },
+  ar: { year:'السنة', power:'القوة', fuel:'الوقود', gear:'ناقل الحركة', km:'عداد المسافة', color:'اللون', new:'جديد' },
 };
 
 const IMAGE_FIELDS = [
@@ -259,7 +259,6 @@ export default function CarDetails() {
                 { label: SL.gear,  value: car.transmission },
                 { label: SL.km,    value: car.mileage === 0 ? SL.new : `${car.mileage.toLocaleString('fr-FR')} km` },
                 { label: SL.color, value: car.color || 'N/A' },
-                { label: SL.stock, value: car.stock > 0 ? `${car.stock} ${SL.available}` : SL.unavailable, highlight: car.stock > 0 ? '#22C55E' : '#EF4444' },
               ].map(({ label, value, highlight }) => (
                 <div key={label}
                   style={{ background: C.card2, borderRadius: 8, padding: isMobile ? '12px 14px' : '14px 16px', display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.15s', border: '1px solid transparent' }}
@@ -293,21 +292,21 @@ export default function CarDetails() {
             {/* Add to cart */}
             <button
               onClick={handleAddToCart}
-              disabled={car.stock === 0 || adding}
+              disabled={adding}
               style={{
                 width: '100%', padding: isMobile ? '18px' : '20px', borderRadius: 12,
                 fontFamily: "'Outfit',sans-serif", fontSize: isMobile?14:15, fontWeight:800,
                 letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none',
-                cursor: car.stock===0 ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                background: car.stock===0 ? C.disabledBg : adding ? 'rgba(19,40,83,0.7)' : 'linear-gradient(135deg,#132853,#0E1E3D)',
-                color: car.stock===0 ? C.disabledText : '#fff',
-                boxShadow: car.stock>0 && !adding ? '0 4px 16px rgba(19,40,83,0.3)' : 'none',
+                background: adding ? 'rgba(19,40,83,0.7)' : 'linear-gradient(135deg,#132853,#0E1E3D)',
+                color: '#fff',
+                boxShadow: !adding ? '0 4px 16px rgba(19,40,83,0.3)' : 'none',
               }}
-              onMouseOver={e => { if (car.stock>0&&!adding) { e.currentTarget.style.background='linear-gradient(135deg,#0E1E3D,#7A0818)'; e.currentTarget.style.transform='scale(1.02)'; }}}
-              onMouseOut={e => { if (car.stock>0&&!adding) { e.currentTarget.style.background='linear-gradient(135deg,#132853,#0E1E3D)'; e.currentTarget.style.transform='scale(1)'; }}}
+              onMouseOver={e => { if (!adding) { e.currentTarget.style.background='linear-gradient(135deg,#0E1E3D,#7A0818)'; e.currentTarget.style.transform='scale(1.02)'; }}}
+              onMouseOut={e => { if (!adding) { e.currentTarget.style.background='linear-gradient(135deg,#132853,#0E1E3D)'; e.currentTarget.style.transform='scale(1)'; }}}
             >
-              {adding ? '...' : car.stock===0 ? t('out_of_stock',lang) : addBtn[lang]||addBtn.fr}
+              {adding ? '...' : addBtn[lang]||addBtn.fr}
             </button>
 
             {car.minSalary && (

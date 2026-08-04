@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS "Car" (
   "model"          TEXT NOT NULL,
   "year"           INT NOT NULL,
   "price"          FLOAT NOT NULL,
-  "stock"          INT DEFAULT 1,
   "description"    TEXT,
   "fuelType"       "FuelType" NOT NULL,
   "transmission"   "Transmission" NOT NULL,
