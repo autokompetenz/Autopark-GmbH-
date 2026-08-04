@@ -7,6 +7,7 @@ import { useAuthStore, useCartStore, useToastStore, useLangStore, useThemeStore 
 import { formatEuro } from '../utils/helpers';
 import { Loader } from '../components/UI';
 import CarCard from '../components/CarCard';
+import Speedometer from '../components/Speedometer';
 import { t } from '../utils/i18n';
 import { CATEGORIES, CATEGORY_ICONS, getCategoryLabel } from '../utils/categories';
 
@@ -122,6 +123,10 @@ export default function CarDetails() {
   if (!car) return null;
 
   const images = IMAGE_FIELDS.map(f => car?.[f]).filter(Boolean);
+
+  const powerHp = Number(car?.power) || 0;
+  const topSpeed = powerHp ? Math.min(340, Math.round(145 + powerHp * 0.4)) : 0;
+  const accel = powerHp ? Math.max(3, Math.min(14, 13.5 - powerHp * 0.029)).toFixed(1) : '0.0';
 
   const breadcrumbs   = { fr:'Accueil', en:'Home', de:'Startseite', ar:'الرئيسية' };
   const catalogBc     = { fr:'Catalogue', en:'Catalogue', de:'Katalog', ar:'الكتالوج' };
@@ -314,7 +319,50 @@ export default function CarDetails() {
         </div>
 
         {/* ==================== PREMIUM SECTIONS ==================== */}
-        
+
+        {/* PERFORMANCE — compteurs animés */}
+        {powerHp > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ marginTop: isMobile ? 64 : 96 }}
+          >
+            <div style={{ marginBottom: isMobile ? 28 : 36, textAlign: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: C.red }}>
+                {lang === 'fr' ? 'Performance' : lang === 'en' ? 'Performance' : lang === 'de' ? 'Leistung' : 'الأداء'}
+              </span>
+              <h2 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: isMobile ? 28 : 42, color: C.text, letterSpacing: '-0.025em', marginTop: 8 }}>
+                {lang === 'fr' ? 'Au cœur de la puissance' : lang === 'en' ? 'The heart of the power' : lang === 'de' ? 'Im Herzen der Kraft' : 'قلب القوة'}
+              </h2>
+            </div>
+
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: isMobile ? '28px 10px' : '48px 32px', boxShadow: C.shadow }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: isMobile ? 4 : 24, alignItems: 'start' }}>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Speedometer value={powerHp} max={Math.max(700, Math.ceil(powerHp / 50) * 50)} unit={lang === 'de' ? 'PS' : 'hp'} label={lang === 'fr' ? 'Puissance' : lang === 'en' ? 'Power' : lang === 'de' ? 'Leistung' : 'القوة'} size={isMobile ? 104 : 210} dark={isDark} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Speedometer value={topSpeed} max={340} unit="km/h" label={lang === 'fr' ? 'Vitesse max' : lang === 'en' ? 'Top speed' : lang === 'de' ? 'Höchstgeschwindigkeit' : 'السرعة القصوى'} size={isMobile ? 104 : 210} dark={isDark} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Speedometer value={14 - Number(accel)} displayValue={Number(accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 104 : 210} dark={isDark} />
+                </div>
+              </div>
+              <p style={{ textAlign: 'center', fontSize: 12, color: C.text3, marginTop: isMobile ? 12 : 20 }}>
+                {lang === 'fr'
+                  ? '* Vitesse max et 0–100 km/h : estimations indicatives basées sur la puissance.'
+                  : lang === 'en'
+                  ? '* Top speed and 0–100 km/h: indicative estimates based on power output.'
+                  : lang === 'de'
+                  ? '* Höchstgeschwindigkeit und 0–100 km/h: Richtwerte auf Basis der Motorleistung.'
+                  : '* السرعة القصوى والتسارع: تقديرات تقريبية بناءً على قوة المحرك.'}
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* 1. SECTION GARANTIE */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
