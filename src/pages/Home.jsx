@@ -1134,7 +1134,7 @@ export default function Home() {
               <div key={showCar.id} style={{ marginTop: isMobile ? 20 : 36, background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:20, padding: isMobile ? '34px 8px 28px' : '64px 24px 52px', boxShadow:'var(--shadow-md)' }}>
                 <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', flexWrap:'wrap', gap: isMobile ? 12 : 32 }}>
                   <Speedometer value={perf.power} max={Math.max(700, Math.ceil(perf.power / 50) * 50)} unit={l==='de'?'PS':'hp'} label={l==='fr'?'Puissance':l==='en'?'Power':l==='de'?'Leistung':l==='es'?'Potencia':l==='it'?'Potenza':'Potência'} size={isMobile ? 140 : 300} dark={isDark} />
-                  <Speedometer value={perf.topSpeed} max={Math.max(250, Math.ceil((perf.topSpeed + 30) / 50) * 50)} unit="km/h" label="AUTOPARK GMBH" size={isMobile ? 140 : 300} dark={isDark} />
+                  <Speedometer value={perf.topSpeed} max={Math.max(250, Math.ceil((perf.topSpeed + 30) / 50) * 50)} unit="km/h" label={l==='fr'?'Vitesse max':l==='en'?'Top speed':l==='de'?'Höchstgeschwindigkeit':l==='es'?'Velocidad máx':l==='it'?'Velocità max':'Velocidade máx'} size={isMobile ? 140 : 300} dark={isDark} />
                   <Speedometer value={14 - Number(perf.accel)} displayValue={Number(perf.accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 140 : 300} dark={isDark} />
                 </div>
                 <p style={{ textAlign:'center', fontSize:12, color:'var(--text-3)', marginTop: isMobile ? 16 : 32 }}>
