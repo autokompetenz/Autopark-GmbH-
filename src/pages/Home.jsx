@@ -996,6 +996,72 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── BRANDS ── */}
+      <section className="section-pad">
+        <div style={{ maxWidth:1400, margin:'0 auto' }}>
+          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:16, marginBottom:44 }}>
+            <div>
+              <div className="section-eyebrow">
+                {l==='fr'?'NOS MARQUES':l==='en'?'OUR BRANDS':l==='de'?'UNSERE MARKEN':l==='es'?'NUESTRAS MARCAS':l==='it'?'I NOSTRI MARCHI':'AS NOSSAS MARCAS'}
+              </div>
+              <h2 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:'clamp(28px,4vw,48px)', color:'var(--text)', letterSpacing:'-0.025em', lineHeight:1.05 }}>
+                {l==='fr'?'Les plus grandes\nmarques':l==='en'?'The world\'s\nbiggest brands':l==='de'?'Die größten\nMarken der Welt':l==='es'?'Las marcas\nmás grandes':l==='it'?'I marchi più\ngrandi al mondo':'As maiores\nmarcas do mundo'}
+              </h2>
+            </div>
+            <Link to="/marques" className="btn-outline">{t('see_all', l)} →</Link>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(3,1fr)' : isTablet ? 'repeat(4,1fr)' : 'repeat(6,1fr)', gap: isMobile ? 10 : 16 }}>
+            {[
+              { name:'BMW', color:'#0066B1', initials:'BM' },
+              { name:'Mercedes', color:'#0A1E2E', initials:'MB' },
+              { name:'Audi', color:'#BB0A30', initials:'AU' },
+              { name:'Volkswagen', color:'#1A1A1A', initials:'VW' },
+              { name:'Porsche', color:'#B12B28', initials:'PO' },
+              { name:'Toyota', color:'#EB0A1E', initials:'TO' },
+              { name:'Honda', color:'#CC0000', initials:'HO' },
+              { name:'Hyundai', color:'#002C5F', initials:'HY' },
+              { name:'Kia', color:'#BB162B', initials:'KI' },
+              { name:'Ford', color:'#003478', initials:'FO' },
+              { name:'Renault', color:'#FFC300', initials:'RE' },
+              { name:'Tesla', color:'#CC0000', initials:'TE' },
+            ].map((b, i) => (
+              <motion.div key={i} initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.4, delay:(i%6)*0.05 }}>
+                <Link to={`/catalog?brand=${encodeURIComponent(b.name)}`} style={{ textDecoration:'none' }}>
+                  <div style={{
+                    background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:12,
+                    padding: isMobile ? '18px 8px' : '26px 12px', textAlign:'center', cursor:'pointer',
+                    transition:'all 0.35s cubic-bezier(0.16,1,0.3,1)', height:'100%',
+                  }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor='rgba(19,40,83,0.2)'; e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.transform='translateY(-3px)'; }}
+                    onMouseOut={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='translateY(0)'; }}>
+                    <div style={{
+                      width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, margin:'0 auto 10px', borderRadius:12,
+                      background:`linear-gradient(135deg, ${b.color}, ${b.color}CC)`,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize: isMobile ? 13 : 17, color:'#fff',
+                    }}>
+                      {b.initials}
+                    </div>
+                    <div style={{ fontFamily:"'Outfit',sans-serif", fontWeight:600, fontSize: isMobile ? 12 : 14, color:'var(--text)', lineHeight:1.2 }}>{b.name}</div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5, delay:0.3 }}
+            style={{ marginTop:32, padding: isMobile ? '20px' : '24px 32px', background:'var(--bg-card2)', border:'1px solid var(--border)', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', gap:16, flexWrap:'wrap' }}>
+            <p style={{ fontSize: isMobile ? 13 : 14, color:'var(--text-3)', margin:0 }}>
+              {l==='fr'?'Votre marque n\'est pas dans la liste ?':l==='en'?'Your brand is not listed?':l==='de'?'Ihre Marke ist nicht dabei?':l==='es'?'¿Su marca no está en la lista?':l==='it'?'Il vostro marchio non è in elenco?':'A sua marca não está na lista?'}
+            </p>
+            <Link to="/marques" style={{ fontSize:13, fontWeight:700, color:'#132853', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:6 }}>
+              {l==='fr'?'Voir toutes les marques':l==='en'?'View all brands':l==='de'?'Alle Marken ansehen':l==='es'?'Ver todas las marcas':l==='it'?'Vedi tutti i marchi':'Ver todas as marcas'} →
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── PROMOTIONS ── */}
       {promotions.length > 0 && (
         <section style={{ borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)' }} className="section-pad">
