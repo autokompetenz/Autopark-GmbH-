@@ -22,9 +22,9 @@ export default function Login() {
       setLoading(true);
       const { data } = await authAPI.login(form);
       login(data.user, data.token);
-      await fetchCart();
       addToast(`${t('welcome_back', l)} ${data.user.firstName} !`, 'success');
       navigate(data.user.role === 'ADMIN' ? '/admin' : '/dashboard');
+      fetchCart();
     } catch (err) {
       addToast(err.response?.data?.error || 'Erreur de connexion', 'error');
     } finally { setLoading(false); }
