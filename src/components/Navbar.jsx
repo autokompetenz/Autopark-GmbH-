@@ -137,12 +137,14 @@ export default function Navbar() {
         {!isMobile && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 32, position: 'relative', zIndex: 1 }}>
             <NavLink to="/catalog"     label={t('nav_vehicles', lang)} />
+            <NavLink to="/marques"     label={t('nav_brands', lang)} />
             <NavLink to="/camping-car" label="Camping Car" />
             <NavLink to="/simulation"  label={t('nav_financing', lang)} />
             <NavLink to="/warranty"    label={t('nav_warranty', lang) || 'Garantie'} />
             <NavLink to="/insurance"   label={t('nav_insurance', lang) || 'Assurance'} />
+            <NavLink to="/vendre"      label={t('nav_sell', lang)} />
             <NavLink to="/avis"        label={t('reviews_label', lang)} />
-            <NavLink to="/track"       label={t('nav_track', lang)} />
+            <NavLink to="/contact"     label={t('nav_contact', lang)} />
           </div>
         )}
 
@@ -242,8 +244,17 @@ export default function Navbar() {
                     <div style={{ marginBottom: 20 }}>
                       {[
                         { to: '/catalog',     icon: '🚗', label: t('nav_vehicles', lang) },
+                        { to: '/marques',     icon: '🏷️', label: t('nav_brands', lang) },
                         { to: '/camping-car', icon: '🚐', label: 'Camping Car' },
                         { to: '/simulation',  icon: '💳', label: t('nav_financing', lang) },
+                        { to: '/vendre',      icon: '💰', label: t('nav_sell', lang) },
+                        { to: '/livraison',   icon: '🚚', label: t('nav_delivery', lang) },
+                        { to: '/maintenance', icon: '🔧', label: t('nav_maintenance', lang) },
+                        { to: '/warranty',    icon: '🛡️', label: t('nav_warranty', lang) || 'Garantie' },
+                        { to: '/faq',         icon: '❓', label: t('nav_faq', lang) },
+                        { to: '/a-propos',    icon: '🏛️', label: t('nav_about', lang) },
+                        { to: '/avis',        icon: '⭐', label: t('reviews_label', lang) },
+                        { to: '/contact',     icon: '📞', label: t('nav_contact', lang) },
                         { to: '/track',       icon: '📍', label: t('nav_track', lang) },
                       ].map(({ to, icon, label }) => (
                         <Link key={to} to={to} onClick={() => setMenuOpen(false)}

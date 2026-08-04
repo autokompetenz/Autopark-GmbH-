@@ -25,6 +25,13 @@ import Warranty     from './pages/Warranty';
 import Insurance    from './pages/Insurance';
 import CampingCar   from './pages/CampingCar';
 import Reviews      from './pages/Reviews';
+import Sell         from './pages/Sell';
+import Contact      from './pages/Contact';
+import Faq          from './pages/Faq';
+import About        from './pages/About';
+import Brands       from './pages/Brands';
+import Delivery     from './pages/Delivery';
+import Maintenance  from './pages/Maintenance';
 
 // Admin
 import AdminLayout      from './pages/admin/AdminLayout';
@@ -86,6 +93,13 @@ export default function App() {
         <Route path="/insurance"  element={<MainLayout><Insurance /></MainLayout>} />
         <Route path="/camping-car" element={<MainLayout><CampingCar /></MainLayout>} />
         <Route path="/avis"        element={<MainLayout><Reviews /></MainLayout>} />
+        <Route path="/vendre"      element={<MainLayout><Sell /></MainLayout>} />
+        <Route path="/contact"     element={<MainLayout><Contact /></MainLayout>} />
+        <Route path="/faq"         element={<MainLayout><Faq /></MainLayout>} />
+        <Route path="/a-propos"    element={<MainLayout><About /></MainLayout>} />
+        <Route path="/marques"     element={<MainLayout><Brands /></MainLayout>} />
+        <Route path="/livraison"   element={<MainLayout><Delivery /></MainLayout>} />
+        <Route path="/maintenance" element={<MainLayout><Maintenance /></MainLayout>} />
 
         {/* Legal pages */}
         <Route path="/mentions-legales"         element={<MainLayout><Legal /></MainLayout>} />

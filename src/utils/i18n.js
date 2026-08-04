@@ -118,6 +118,12 @@ export const translations = {
   contact_title:    { fr:'Contactez-nous', en:'Contact Us', de:'Kontaktieren Sie uns', es:'Contáctenos', it:'Contattaci', pt:'Fale Connosco' },
   nav_warranty:     { fr:'Garantie',       en:'Warranty',         de:'Garantie',          es:'Garantía',         it:'Garanzia',         pt:'Garantia' },
   nav_insurance:    { fr:'Assurance',      en:'Insurance',        de:'Versicherung',      es:'Seguro',           it:'Assicurazione',    pt:'Seguro' },
+  nav_sell:         { fr:'Vendre',         en:'Sell',             de:'Verkaufen',         es:'Vender',           it:'Vendi',            pt:'Vender' },
+  nav_faq:          { fr:'FAQ',            en:'FAQ',              de:'FAQ',               es:'FAQ',              it:'FAQ',              pt:'FAQ' },
+  nav_about:        { fr:'À propos',       en:'About us',         de:'Über uns',          es:'Sobre nosotros',   it:'Chi siamo',        pt:'Sobre nós' },
+  nav_brands:       { fr:'Marques',        en:'Brands',           de:'Marken',            es:'Marcas',           it:'Marchi',           pt:'Marcas' },
+  nav_delivery:     { fr:'Livraison',      en:'Delivery',         de:'Lieferung',         es:'Entrega',          it:'Consegna',         pt:'Entrega' },
+  nav_maintenance:  { fr:'Entretien',      en:'Maintenance',      de:'Wartung',           es:'Mantenimiento',    it:'Manutenzione',     pt:'Manutenção' },
 };
 
 export function t(key, lang = 'fr') {
