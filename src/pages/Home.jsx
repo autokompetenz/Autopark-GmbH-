@@ -616,7 +616,7 @@ export default function Home() {
 
   useEffect(() => {
     if (perfCars.length <= 1 || perfPaused) return;
-    const id = setInterval(() => setPerfIndex((i) => (i + 1) % perfCars.length), 4500);
+    const id = setInterval(() => setPerfIndex((i) => (i + 1) % perfCars.length), 2000);
     return () => clearInterval(id);
   }, [perfCars.length, perfPaused]);
 
@@ -1128,21 +1128,6 @@ export default function Home() {
                     </div>
                   </div>
                 </Link>
-
-                {perfCars.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setPerfIndex((perfIndex - 1 + perfCars.length) % perfCars.length)}
-                      aria-label="Previous"
-                      style={{ position:'absolute', left:16, top:'50%', transform:'translateY(-50%)', width:48, height:48, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.4)', backdropFilter:'blur(6px)', color:'#fff', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
-                    >‹</button>
-                    <button
-                      onClick={() => setPerfIndex((perfIndex + 1) % perfCars.length)}
-                      aria-label="Next"
-                      style={{ position:'absolute', right:16, top:'50%', transform:'translateY(-50%)', width:48, height:48, borderRadius:'50%', border:'1px solid rgba(255,255,255,0.3)', background:'rgba(0,0,0,0.4)', backdropFilter:'blur(6px)', color:'#fff', fontSize:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1 }}
-                    >›</button>
-                  </>
-                )}
               </div>
 
               {/* Compteurs (bande pleine largeur · key = l'animation repart à zéro) */}
