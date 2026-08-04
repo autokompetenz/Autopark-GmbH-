@@ -298,33 +298,59 @@ export default function Navbar() {
 
                   {/* Mobile nav links */}
                   {isMobile && (
-                    <div style={{ marginBottom: 20 }}>
+                    <div style={{ marginBottom: 8 }}>
                       {[
-                        { to: '/catalog',     icon: '🚗', label: t('nav_vehicles', lang) },
-                        { to: '/marques',     icon: '🏷️', label: t('nav_brands', lang) },
-                        { to: '/camping-car', icon: '🚐', label: 'Camping Car' },
-                        { to: '/simulation',  icon: '💳', label: t('nav_financing', lang) },
-                        { to: '/vendre',      icon: '💰', label: t('nav_sell', lang) },
-                        { to: '/livraison',   icon: '🚚', label: t('nav_delivery', lang) },
-                        { to: '/maintenance', icon: '🔧', label: t('nav_maintenance', lang) },
-                        { to: '/warranty',    icon: '🛡️', label: t('nav_warranty', lang) || 'Garantie' },
-                        { to: '/faq',         icon: '❓', label: t('nav_faq', lang) },
-                        { to: '/a-propos',    icon: '🏛️', label: t('nav_about', lang) },
-                        { to: '/avis',        icon: '⭐', label: t('reviews_label', lang) },
-                        { to: '/contact',     icon: '📞', label: t('nav_contact', lang) },
-                        { to: '/track',       icon: '📍', label: t('nav_track', lang) },
-                      ].map(({ to, icon, label }) => (
-                        <Link key={to} to={to} onClick={() => setMenuOpen(false)}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 12,
-                            padding: '14px 0', fontSize: 15,
-                            color: menuText,
-                            textDecoration: 'none',
-                            borderBottom: `1px solid ${menuBorder}`,
-                            fontWeight: 500, fontFamily: F,
+                        {
+                          label: t('nav_group_buy', lang),
+                          items: [
+                            { to: '/catalog',     icon: '🚗', label: t('nav_vehicles', lang) },
+                            { to: '/marques',     icon: '🏷️', label: t('nav_brands', lang) },
+                            { to: '/camping-car', icon: '🚐', label: 'Camping Car' },
+                            { to: '/simulation',  icon: '💳', label: t('nav_financing', lang) },
+                          ],
+                        },
+                        {
+                          label: t('nav_group_services', lang),
+                          items: [
+                            { to: '/vendre',      icon: '💰', label: t('nav_sell', lang) },
+                            { to: '/livraison',   icon: '🚚', label: t('nav_delivery', lang) },
+                            { to: '/maintenance', icon: '🔧', label: t('nav_maintenance', lang) },
+                            { to: '/warranty',    icon: '🛡️', label: t('nav_warranty', lang) || 'Garantie' },
+                            { to: '/insurance',   icon: '📋', label: t('nav_insurance', lang) || 'Assurance' },
+                          ],
+                        },
+                        {
+                          label: t('nav_group_info', lang),
+                          items: [
+                            { to: '/faq',         icon: '❓', label: t('nav_faq', lang) },
+                            { to: '/a-propos',    icon: '🏛️', label: t('nav_about', lang) },
+                            { to: '/avis',        icon: '⭐', label: t('reviews_label', lang) },
+                            { to: '/contact',     icon: '📞', label: t('nav_contact', lang) },
+                            { to: '/track',       icon: '📍', label: t('nav_track', lang) },
+                          ],
+                        },
+                      ].map((group) => (
+                        <div key={group.label} style={{ marginBottom: 20 }}>
+                          <p style={{
+                            fontSize: 10, fontWeight: 800, letterSpacing: '0.22em', textTransform: 'uppercase',
+                            color: 'var(--red)', marginBottom: 4, padding: '4px 0',
                           }}>
-                          <span style={{ fontSize: 20 }}>{icon}</span> {label}
-                        </Link>
+                            {group.label}
+                          </p>
+                          {group.items.map(({ to, icon, label }) => (
+                            <Link key={to} to={to} onClick={() => setMenuOpen(false)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 12,
+                                padding: '12px 0', fontSize: 15,
+                                color: menuText,
+                                textDecoration: 'none',
+                                borderBottom: `1px solid ${menuBorder}`,
+                                fontWeight: 500, fontFamily: F,
+                              }}>
+                              <span style={{ fontSize: 20, width: 24, textAlign: 'center' }}>{icon}</span> {label}
+                            </Link>
+                          ))}
+                        </div>
                       ))}
                     </div>
                   )}
