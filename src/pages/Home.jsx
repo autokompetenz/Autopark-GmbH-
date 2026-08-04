@@ -1138,7 +1138,7 @@ export default function Home() {
                   <Speedometer value={14 - Number(perf.accel)} displayValue={Number(perf.accel)} max={14} unit="s" label="0–100 km/h" size={isMobile ? 140 : 300} dark={isDark} />
                 </div>
                 <p style={{ textAlign:'center', fontSize:12, color:'var(--text-3)', marginTop: isMobile ? 16 : 32 }}>
-                  vitesse max 0-100 km/h : estimations indicatives basées sur la puissance par AUTOPARK GMBH
+                  AUTOPARK GMBH
                 </p>
               </div>
             </motion.div>
