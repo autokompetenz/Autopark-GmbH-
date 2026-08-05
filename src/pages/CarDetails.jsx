@@ -9,7 +9,6 @@ import { Loader } from '../components/UI';
 import CarCard from '../components/CarCard';
 import Speedometer from '../components/Speedometer';
 import { t } from '../utils/i18n';
-import { CATEGORIES, CATEGORY_ICONS, getCategoryLabel } from '../utils/categories';
 
 const INFO_TITLE = {
   fr: 'Informations complémentaires sur le véhicule',
@@ -743,43 +742,40 @@ export default function CarDetails() {
           >
             <div style={{ marginBottom: isMobile ? 28 : 36 }}>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: C.red }}>
-                {lang==='fr'?'AUTRES TYPES DE VÉHICULES':lang==='en'?'OTHER VEHICLE TYPES':lang==='de'?'ANDERE FAHRZEUGTYPEN':lang==='es'?'OTROS TIPOS DE VEHÍCULOS':lang==='it'?'ALTRI TIPI DI VEICOLI':'OUTROS TIPOS DE VEÍCULOS'}
+                {lang==='fr'?'NOS MARQUES':lang==='en'?'OUR BRANDS':lang==='de'?'UNSERE MARKEN':lang==='es'?'NUESTRAS MARCAS':lang==='it'?'I NOSTRI MARCHI':'AS NOSSAS MARCAS'}
               </span>
               <h2 style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: isMobile ? 28 : 42, color: C.text, letterSpacing: '-0.025em', marginTop: 8 }}>
                 {lang==='fr'?'Explorez notre gamme':lang==='en'?'Explore our range':lang==='de'?'Erkunden Sie unsere Auswahl':lang==='es'?'Explore nuestra gama':lang==='it'?'Esplora la nostra gamma':'Explore nossa gama'}
               </h2>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 16 }}>
-              {CATEGORIES.filter(cat => cat !== car.category).map(cat => (
-                <Link
-                  key={cat}
-                  to={`/catalog?category=${cat}`}
-                  style={{
-                    background: C.card,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: 16,
-                    padding: 24,
-                    textDecoration: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 12,
-                    transition: 'all 0.3s',
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(19,40,83,0.4)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
-                  onMouseOut={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <div style={{ fontSize: 40 }}>{CATEGORY_ICONS[cat]}</div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{getCategoryLabel(lang, cat)}</div>
-                  <div style={{ fontSize: 13, color: C.text3 }}>
-                    {lang === 'fr' ? 'Voir le catalogue →' :
-                     lang === 'en' ? 'View catalogue →' :
-                     lang === 'de' ? 'Katalog ansehen →' :
-                     lang === 'ar' ? 'عرض الكتالوج ←' :
-                     'Ver catálogo →'}
-                  </div>
-                </Link>
-              ))}
+              <Link
+                to="/catalog"
+                style={{
+                  background: C.card,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 16,
+                  padding: 24,
+                  textDecoration: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 12,
+                  transition: 'all 0.3s',
+                }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(19,40,83,0.4)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <div style={{ fontSize: 40 }}>🚗</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{lang==='fr'?'Catalogue complet':lang==='en'?'Full catalogue':lang==='de'?'Kompletter Katalog':lang==='es'?'Catálogo completo':lang==='it'?'Catalogo completo':'Catálogo completo'}</div>
+                <div style={{ fontSize: 13, color: C.text3 }}>
+                  {lang === 'fr' ? 'Voir le catalogue →' :
+                   lang === 'en' ? 'View catalogue →' :
+                   lang === 'de' ? 'Katalog ansehen →' :
+                   lang === 'ar' ? 'عرض الكتالوج ←' :
+                   'Ver catálogo →'}
+                </div>
+              </Link>
             </div>
           </motion.div>
         )}

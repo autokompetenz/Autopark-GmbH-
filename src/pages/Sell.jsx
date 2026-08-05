@@ -392,11 +392,11 @@ export default function Sell() {
               }}>
                 💬 WhatsApp
               </a>
-              <a href="mailto:info@autopark-gmbh.com" style={{
+              <a href="mailto:autopark@autoparkgmbh.com" style={{
                 background:'rgba(255,255,255,0.1)', color:'#fff', textDecoration:'none', fontFamily:"'Outfit',sans-serif",
                 fontSize:14, fontWeight:700, padding:'14px 28px', borderRadius:8, border:'1px solid rgba(255,255,255,0.3)', display:'inline-flex', alignItems:'center', gap:8
               }}>
-                ✉ info@autopark-gmbh.com
+                ✉ autopark@autoparkgmbh.com
               </a>
             </div>
           </motion.div>

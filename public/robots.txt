@@ -10,4 +10,4 @@ Disallow: /cart
 Disallow: /orders
 Disallow: /order-confirm/
 
-Sitemap: https://autopark-gmbh.vercel.app/sitemap.xml
+Sitemap: https://autoparkgmbh.com/sitemap.xml

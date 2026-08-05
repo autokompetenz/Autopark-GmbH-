@@ -5,9 +5,9 @@ import { useLangStore, useThemeStore } from '../store';
 
 const WA = '+491745232945';
 const WA_DISPLAY = '+49 174 523 29 45';
-const EMAIL = 'info@autopark-gmbh.com';
+const EMAIL = 'autopark@autoparkgmbh.com';
 const ADDRESS = 'Franz-Julius-Haenel-Str. 3, 06618 Naumburg';
-const SITE_URL = 'autopark-gmbh.vercel.app';
+const SITE_URL = 'autoparkgmbh.com';
 
 /* ─── Knowledge Base ─── */
 const R = {

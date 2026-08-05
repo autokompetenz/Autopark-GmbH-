@@ -10,7 +10,6 @@ import BrandLogo from '../components/BrandLogo';
 import Speedometer from '../components/Speedometer';
 import { useBreakpoint } from '../hooks/useBreakpoint';
 import { ALL_REVIEWS } from '../utils/reviews';
-import { CATEGORIES, CAT_LABELS, CATEGORY_ICONS } from '../utils/categories';
 import { HOME_BRANDS } from '../utils/brands';
 
 const SERVICES = [
@@ -489,7 +488,7 @@ function FAQSection({ l, isMobile }) {
               style={{ background:'#25D366', color:'#fff', textDecoration:'none', fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:700, padding:'11px 22px', borderRadius:8, display:'inline-flex', alignItems:'center', gap:8 }}>
               💬 WhatsApp
             </a>
-            <a href="mailto:info@autopark-gmbh.com" className="btn-ghost" style={{ fontSize:13 }}>
+            <a href="mailto:autopark@autoparkgmbh.com" className="btn-ghost" style={{ fontSize:13 }}>
               ✉ Email
             </a>
           </div>
@@ -573,7 +572,6 @@ export default function Home() {
   const [loading, setLoading]           = useState(true);
   const [trackNum, setTrackNum]         = useState('');
   const [searchQuery, setSearchQuery]   = useState('');
-  const [selectedCat, setSelectedCat]   = useState('all');
   const heroRef = useRef(null);
   const navigate = useNavigate();
   const l = lang || 'fr';
@@ -581,7 +579,6 @@ export default function Home() {
   const goSearch = () => {
     const params = new URLSearchParams();
     if (searchQuery.trim()) params.set('search', searchQuery.trim());
-    if (selectedCat && selectedCat !== 'all') params.set('category', selectedCat);
     navigate(`/catalog?${params.toString()}`);
   };
   const { scrollYProgress } = useScroll({ target:heroRef, offset:['start start','end start'] });
@@ -700,7 +697,7 @@ export default function Home() {
             }}
           >
             {/* Search input */}
-            <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:16 }}>
+            <div style={{ display:'flex', gap:10, alignItems:'center' }}>
               <div style={{ flex:1, position:'relative' }}>
                 <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:16, opacity:0.4, pointerEvents:'none' }}>🔍</span>
                 <input
@@ -751,36 +748,6 @@ export default function Home() {
                 {l==='fr'?'Rechercher':l==='en'?'Search':l==='de'?'Suchen':l==='es'?'Buscar':l==='it'?'Cerca':l==='pt'?'Pesquisar':'بحث'}
               </button>
             </div>
-
-            {/* Category chips */}
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => { navigate(`/catalog?category=${cat}`); }}
-                  style={{
-                    background: selectedCat === cat ? 'rgba(19,40,83,0.1)' : 'transparent',
-                    border:`1px solid ${selectedCat === cat ? 'rgba(19,40,83,0.3)' : 'var(--border)'}`,
-                    borderRadius:20,
-                    padding:'6px 14px',
-                    fontSize:12.5,
-                    fontWeight:600,
-                    fontFamily:"'Outfit',sans-serif",
-                    color: selectedCat === cat ? '#132853' : 'var(--text-3)',
-                    cursor:'pointer',
-                    transition:'all 0.15s',
-                    display:'inline-flex',
-                    alignItems:'center',
-                    gap:5,
-                  }}
-                  onMouseOver={e => { if(selectedCat !== cat) { e.currentTarget.style.borderColor = 'rgba(19,40,83,0.2)'; e.currentTarget.style.color = 'var(--text)'; }}}
-                  onMouseOut={e => { if(selectedCat !== cat) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)'; }}}
-                >
-                  <span>{CATEGORY_ICONS[cat]}</span>
-                  {(CAT_LABELS[l] || CAT_LABELS.fr)[cat]}
-                </button>
-              ))}
-            </div>
           </motion.div>
         </div>
       </section>
@@ -807,12 +774,12 @@ export default function Home() {
             <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
               {[
                 { step:'01', icon:'🔍',
-                  fr:{ title:'Choisir votre véhicule', desc:'Parcourez le catalogue, filtrez par catégorie, budget ou carburant. Consultez chaque fiche avec photos et caractéristiques.' },
-                  en:{ title:'Choose your vehicle', desc:'Browse the catalogue, filter by category, budget or fuel. View each listing with photos and full specs.' },
-                  de:{ title:'Fahrzeug wählen', desc:'Durchsuchen Sie den Katalog, filtern Sie nach Kategorie, Budget oder Kraftstoff. Jedes Inserat mit Fotos und Details.' },
-                  es:{ title:'Elegir su vehículo', desc:'Explore el catálogo, filtre por categoría, presupuesto o combustible. Consulte cada ficha con fotos y especificaciones.' },
-                  it:{ title:'Scegliere il veicolo', desc:'Sfogliate il catalogo, filtrate per categoria, budget o carburante. Visualizzate ogni scheda con foto e specifiche.' },
-                  pt:{ title:'Escolher o veículo', desc:'Navegue pelo catálogo, filtre por categoria, orçamento ou combustível. Consulte cada ficha com fotos e especificações.' },
+                  fr:{ title:'Choisir votre véhicule', desc:'Parcourez le catalogue, filtrez par marque, budget ou carburant. Consultez chaque fiche avec photos et caractéristiques.' },
+                  en:{ title:'Choose your vehicle', desc:'Browse the catalogue, filter by brand, budget or fuel. View each listing with photos and full specs.' },
+                  de:{ title:'Fahrzeug wählen', desc:'Durchsuchen Sie den Katalog, filtern Sie nach Marke, Budget oder Kraftstoff. Jedes Inserat mit Fotos und Details.' },
+                  es:{ title:'Elegir su vehículo', desc:'Explore el catálogo, filtre por marca, presupuesto o combustible. Consulte cada ficha con fotos y especificaciones.' },
+                  it:{ title:'Scegliere il veicolo', desc:'Sfogliate il catalogo, filtrate per marca, budget o carburante. Visualizzate ogni scheda con foto e specifiche.' },
+                  pt:{ title:'Escolher o veículo', desc:'Navegue pelo catálogo, filtre por marca, orçamento ou combustível. Consulte cada ficha com fotos e especificações.' },
                 },
                 { step:'02', icon:'🛒',
                   fr:{ title:'Commander en quelques clics', desc:'Ajoutez le véhicule au panier, choisissez votre mode de financement et confirmez votre commande en toute sécurité.' },
@@ -857,12 +824,12 @@ export default function Home() {
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:48, position:'relative' }}>
               {[
                 { step:'01', icon:'🔍',
-                  fr:{ title:'Choisir', desc:'Parcourez le catalogue, filtrez par catégorie, budget ou carburant.' },
-                  en:{ title:'Choose', desc:'Browse the catalogue, filter by category, budget or fuel.' },
-                  de:{ title:'Wählen', desc:'Durchsuchen Sie den Katalog, filtern Sie nach Kategorie, Budget oder Kraftstoff.' },
-                  es:{ title:'Elegir', desc:'Explore el catálogo, filtre por categoría, presupuesto o combustible.' },
-                  it:{ title:'Scegliere', desc:'Sfogliate il catalogo, filtrate per categoria, budget o carburante.' },
-                  pt:{ title:'Escolher', desc:'Navegue pelo catálogo, filtre por categoria, orçamento ou combustível.' },
+                  fr:{ title:'Choisir', desc:'Parcourez le catalogue, filtrez par marque, budget ou carburant.' },
+                  en:{ title:'Choose', desc:'Browse the catalogue, filter by brand, budget or fuel.' },
+                  de:{ title:'Wählen', desc:'Durchsuchen Sie den Katalog, filtern Sie nach Marke, Budget oder Kraftstoff.' },
+                  es:{ title:'Elegir', desc:'Explore el catálogo, filtre por marca, presupuesto o combustible.' },
+                  it:{ title:'Scegliere', desc:'Sfogliate il catalogo, filtrate per marca, budget o carburante.' },
+                  pt:{ title:'Escolher', desc:'Navegue pelo catálogo, filtre por marca, orçamento ou combustível.' },
                 },
                 { step:'02', icon:'🛒',
                   fr:{ title:'Commander', desc:'Ajoutez au panier, choisissez le financement et validez en toute sécurité.' },
@@ -982,41 +949,6 @@ export default function Home() {
               </Link>
             </motion.div>
           )}
-        </div>
-      </section>
-
-      {/* ── BROWSE BY CATEGORY ── */}
-      <section style={{ background:'var(--bg-card2)', borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)' }} className="section-pad">
-        <div style={{ maxWidth:1400, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom: isMobile ? 32 : 48 }}>
-            <div className="section-eyebrow" style={{ justifyContent:'center' }}>
-              {l==='fr'?'EXPLORER PAR CATÉGORIE':l==='en'?'BROWSE BY CATEGORY':l==='de'?'NACH KATEGORIE':l==='es'?'EXPLORAR POR CATEGORÍA':l==='it'?'SFOGLIA PER CATEGORIA':'EXPLORAR POR CATEGORIA'}
-            </div>
-            <h2 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:'clamp(28px,4vw,48px)', color:'var(--text)', letterSpacing:'-0.025em', lineHeight:1.05 }}>
-              {l==='fr'?'Trouvez le véhicule\nidéal':l==='en'?'Find the Perfect\nVehicle':l==='de'?'Finden Sie das\nperfekte Fahrzeug':l==='es'?'Encuentra el\nvehículo ideal':l==='it'?'Trova il veicolo\nperfetto':'Encontre o\nveículo ideal'}
-            </h2>
-          </div>
-
-          <div style={{ display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : isTablet ? 'repeat(3,1fr)' : 'repeat(4,1fr)', gap: isMobile ? 12 : 16 }}>
-            {CATEGORIES.map((cat, i) => (
-              <motion.div key={cat}
-                initial={{ opacity:0, y:16 }}
-                whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true }}
-                transition={{ duration:0.4, delay:i*0.05 }}>
-                <Link to={`/catalog?category=${cat}`} style={{ textDecoration:'none' }}>
-                  <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:12, padding: isMobile ? '28px 14px' : '36px 20px', textAlign:'center', cursor:'pointer', transition:'all 0.35s cubic-bezier(0.16,1,0.3,1)' }}
-                    onMouseOver={e => { e.currentTarget.style.borderColor='rgba(19,40,83,0.15)'; e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.transform='translateY(-2px)'; }}
-                    onMouseOut={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='translateY(0)'; }}>
-                    <div style={{ fontSize: isMobile ? 36 : 44, marginBottom: isMobile ? 12 : 18 }}>{CATEGORY_ICONS[cat]}</div>
-                    <h3 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:600, fontSize: isMobile ? 14 : 16, color:'var(--text)', marginBottom:0, letterSpacing:'0.02em' }}>
-                      {(CAT_LABELS[l]||CAT_LABELS.fr)[cat]}
-                    </h3>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -1492,7 +1424,7 @@ export default function Home() {
                 style={{ background:'#25D366', color:'#fff', textDecoration:'none', fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:600, padding:'14px 28px', borderRadius:8, display:'inline-flex', alignItems:'center', gap:8, letterSpacing:'0.02em' }}>
                 💬 WhatsApp
               </a>
-              <a href="mailto:info@autopark-gmbh.com" className="btn-ghost" style={{ fontSize:13 }}>
+              <a href="mailto:autopark@autoparkgmbh.com" className="btn-ghost" style={{ fontSize:13 }}>
                 ✉ Email
               </a>
             </div>
@@ -1542,7 +1474,7 @@ export default function Home() {
                 <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.3em', textTransform:'uppercase', color:'var(--text-3)', marginBottom:14 }}>Contact</p>
                 <p style={{ fontSize:13, color:'var(--text-3)', lineHeight:1.8, fontWeight:400 }}>
                   📞 +49 174 523 29 45<br/>
-                  ✉ info@autopark-gmbh.com<br/>
+                  ✉ autopark@autoparkgmbh.com<br/>
                   💬 <a href="https://wa.me/491745232945" style={{ color:'var(--red)', textDecoration:'none' }}>WhatsApp</a>
                 </p>
               </div>

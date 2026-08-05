@@ -2,85 +2,85 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://autopark-gmbh.vercel.app/</loc>
+    <loc>https://autoparkgmbh.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://autopark-gmbh.vercel.app/" />
-    <xhtml:link rel="alternate" hreflang="de" href="https://autopark-gmbh.vercel.app/?lang=de" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://autopark-gmbh.vercel.app/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://autoparkgmbh.com/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://autoparkgmbh.com/?lang=de" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoparkgmbh.com/?lang=en" />
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/catalog</loc>
+    <loc>https://autoparkgmbh.com/catalog</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/marques</loc>
+    <loc>https://autoparkgmbh.com/marques</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/simulation</loc>
+    <loc>https://autoparkgmbh.com/simulation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/vendre</loc>
+    <loc>https://autoparkgmbh.com/vendre</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/contact</loc>
+    <loc>https://autoparkgmbh.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/a-propos</loc>
+    <loc>https://autoparkgmbh.com/a-propos</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/faq</loc>
+    <loc>https://autoparkgmbh.com/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/livraison</loc>
+    <loc>https://autoparkgmbh.com/livraison</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/maintenance</loc>
+    <loc>https://autoparkgmbh.com/maintenance</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/warranty</loc>
+    <loc>https://autoparkgmbh.com/warranty</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/insurance</loc>
+    <loc>https://autoparkgmbh.com/insurance</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/avis</loc>
+    <loc>https://autoparkgmbh.com/avis</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/camping-car</loc>
+    <loc>https://autoparkgmbh.com/camping-car</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/mentions-legales</loc>
+    <loc>https://autoparkgmbh.com/mentions-legales</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://autopark-gmbh.vercel.app/politique-confidentialite</loc>
+    <loc>https://autoparkgmbh.com/politique-confidentialite</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

@@ -13,10 +13,10 @@ async function main() {
   // Admin
   const adminPwd = await bcrypt.hash('password', 12);
   await prisma.user.upsert({
-    where: { email: 'info@autopark-gmbh.com' },
+    where: { email: 'autopark@autoparkgmbh.com' },
     update: {},
     create: {
-      username: 'admin', email: 'info@autopark-gmbh.com',
+      username: 'admin', email: 'autopark@autoparkgmbh.com',
       password: adminPwd, firstName: 'Admin', lastName: 'Autopark',
       role: 'ADMIN', emailVerified: true,
     },
@@ -25,10 +25,10 @@ async function main() {
   // Demo client
   const clientPwd = await bcrypt.hash('password', 12);
   await prisma.user.upsert({
-    where: { email: 'client@autopark-gmbh.com' },
+    where: { email: 'client@autoparkgmbh.com' },
     update: {},
     create: {
-      username: 'max_mustermann', email: 'client@autopark-gmbh.com',
+      username: 'max_mustermann', email: 'client@autoparkgmbh.com',
       password: clientPwd, firstName: 'Max', lastName: 'Mustermann',
       phone: '+49 157 000 000 00', monthlySalary: 3500, role: 'CLIENT', emailVerified: true,
     },
@@ -67,8 +67,8 @@ async function main() {
     },
   });
 
-  console.log('✅ Admin:  info@autopark-gmbh.com / password');
-  console.log('✅ Client: client@autopark-gmbh.com / password');
+  console.log('✅ Admin:  autopark@autoparkgmbh.com / password');
+  console.log('✅ Client: client@autoparkgmbh.com / password');
   console.log('✅ 10 véhicules créés');
   console.log('🎉 Seeding terminé !');
 }

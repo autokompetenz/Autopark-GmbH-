@@ -7,12 +7,10 @@ import { Loader } from '../components/UI';
 import { useLangStore } from '../store';
 import { t } from '../utils/i18n';
 import { useBreakpoint } from '../hooks/useBreakpoint';
-import { CATEGORIES, CAT_LABELS } from '../utils/categories';
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [cars, setCars]             = useState([]);
-  const [categories, setCategories] = useState([]);
   const [brands, setBrands]         = useState([]);
   const [total, setTotal]           = useState(0);
   const [loading, setLoading]       = useState(true);
@@ -21,7 +19,6 @@ export default function Catalog() {
   const { isMobile, isTablet } = useBreakpoint();
   const l = lang || 'fr';
 
-  const category = searchParams.get('category') || 'all';
   const brand    = searchParams.get('brand')    || '';
   const search   = searchParams.get('search')   || '';
   const sort     = searchParams.get('sort')     || '';
@@ -30,7 +27,6 @@ export default function Catalog() {
     setLoading(true);
     try {
       const params = {};
-      if (category !== 'all') params.category = category;
       if (brand) params.brand = brand;
       if (search) params.search = search;
       if (sort)   params.sort   = sort;
@@ -39,11 +35,10 @@ export default function Catalog() {
       setTotal(data.total || 0);
     } catch(e){ console.error(e); }
     finally { setLoading(false); }
-  }, [category, brand, search, sort]);
+  }, [brand, search, sort]);
 
   useEffect(() => { fetchCars(); }, [fetchCars]);
   useEffect(() => {
-    carAPI.getCategories().then(r => setCategories(r.data.categories || [])).catch(console.error);
     carAPI.getBrands().then(r => setBrands(r.data.brands || [])).catch(console.error);
   }, []);
 
@@ -74,24 +69,6 @@ export default function Catalog() {
         onChange={e => setFilter('search', e.target.value)}
         className="input-luxury" style={{ fontSize:15, marginBottom:6 }} />
 
-      {/* Categories */}
-      <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:10, overflow:'hidden' }}>
-        <p style={{ fontSize:10, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase', color:'var(--red)', padding:'14px 16px 8px' }}>
-          {t('filters', l)}
-        </p>
-        {[{ id:'all', label:t('all_categories', l), count:total },
-          ...CATEGORIES.map(c => ({ id:c, label:(CAT_LABELS[l]||CAT_LABELS.fr)[c], count: categories.find?.(x=>x.name===c)?.count || 0 }))
-        ].map(({ id, label, count }) => (
-          <button key={id} onClick={() => setFilter('category', id==='all'?'':id)}
-            style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px', background:category===id?'var(--red-bg)':'transparent', border:'none', borderLeft:`3px solid ${category===id?'var(--red)':'transparent'}`, color:category===id?'var(--red)':'var(--text-3)', fontFamily:"'Outfit',sans-serif", fontSize:14, fontWeight:category===id?700:400, cursor:'pointer', transition:'all 0.15s', textAlign:'left' }}
-            onMouseOver={e=>{ if(category!==id){ e.currentTarget.style.background='var(--bg-card2)'; e.currentTarget.style.color='var(--text)'; } }}
-            onMouseOut={e=>{ if(category!==id){ e.currentTarget.style.background='transparent'; e.currentTarget.style.color='var(--text-3)'; } }}>
-            <span>{label}</span>
-            {count > 0 && <span style={{ fontSize:12, opacity:0.45 }}>{count}</span>}
-          </button>
-        ))}
-      </div>
-
       {/* Brands */}
       {brands.length > 0 && (
         <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:10, overflow:'hidden' }}>
@@ -116,7 +93,7 @@ export default function Catalog() {
       )}
 
       {/* Reset */}
-      {(category !== 'all' || brand || search || sort) && (
+      {(brand || search || sort) && (
         <button onClick={resetAll} style={{ width:'100%', padding:'10px', background:'rgba(19,40,83,0.06)', border:'1px solid var(--red-border)', borderRadius:8, color:'var(--red)', fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer' }}>
           ✕ {t('reset', l)}
         </button>
@@ -162,7 +139,7 @@ export default function Catalog() {
           <div style={{ display:'flex', gap:10, marginBottom:16 }}>
             <button onClick={() => setDrawerOpen(true)}
               style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:8, padding:'11px 14px', color:'var(--text)', fontFamily:"'Outfit',sans-serif", fontSize:14, fontWeight:700, cursor:'pointer', boxShadow:'var(--shadow-sm)' }}>
-              ⚙ {t('filters', l)} {(category!=='all'||brand)&&`· ${brand||(CAT_LABELS[l]||CAT_LABELS.fr)[category]||''}`}
+              ⚙ {t('filters', l)} {(brand)&&`· ${brand||''}`}
             </button>
             <SortSelect />
           </div>
@@ -186,7 +163,7 @@ export default function Catalog() {
               <p style={{ fontSize:14, color:'var(--text-3)' }}>
                 <span style={{ color:'var(--red)', fontWeight:700 }}>{total}</span> {t('found', l)}
               </p>
-              {!isMobile && (category!=='all'||brand||search||sort) && (
+              {!isMobile && (brand||search||sort) && (
                 <button onClick={resetAll} style={{ fontSize:13, color:'var(--red)', background:'none', border:'none', cursor:'pointer', fontFamily:"'Outfit',sans-serif", fontWeight:600, textDecoration:'underline' }}>
                   {t('reset', l)}
                 </button>
@@ -200,7 +177,7 @@ export default function Catalog() {
                 <div style={{ fontSize:64, marginBottom:16 }}>🔍</div>
                 <h3 style={{ fontFamily:"'Outfit',sans-serif", fontWeight:700, fontSize:24, color:'var(--text)', marginBottom:10 }}>{t('no_results', l)}</h3>
                 <p style={{ fontSize:15, color:'var(--text-3)', marginBottom:24 }}>
-                  {lang==='fr'?'Essayez une autre catégorie.':lang==='en'?'Try another category.':lang==='de'?'Versuchen Sie eine andere Kategorie.':lang==='es'?'Pruebe otra categoría.':lang==='it'?'Prova un\'altra categoria.':'Tente outra categoria.'}
+                  {lang==='fr'?'Essayez une autre marque ou un autre terme.':lang==='en'?'Try another brand or term.':lang==='de'?'Versuchen Sie eine andere Marke oder einen anderen Begriff.':lang==='es'?'Pruebe otra marca u otro término.':lang==='it'?'Prova un\'altra marca o un altro termine.':'Tente outra marca ou outro termo.'}
                 </p>
                 <button onClick={resetAll} className="btn-primary">{t('reset', l)}</button>
               </div>

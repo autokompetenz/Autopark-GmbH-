@@ -1,4 +1,4 @@
-# Autopark GmbH — autopark-gmbh.vercel.app
+# Autopark GmbH — autoparkgmbh.com
 
 ## Structure (monorepo unifié pour Vercel)
 ```
@@ -51,7 +51,7 @@ git push -u origin main
 | `DIRECT_URL` | postgresql://postgres.XXX:PWD@pooler.supabase.com:5432/postgres |
 | `JWT_SECRET` | (chaîne aléatoire 64+ caractères) |
 
-5. Deploy → ✅ https://autopark-gmbh.vercel.app
+5. Deploy → ✅ https://autoparkgmbh.com
 
 ### 4. Seeder (une seule fois)
 Dans Supabase → SQL Editor, exécuter le seed manuellement, ou:
@@ -62,4 +62,4 @@ npm run seed
 
 ## Comptes demo
 - Admin : autoKompetenz@gmail.com / password
-- Client : client@autopark-gmbh.com / password
+- Client : client@autoparkgmbh.com / password
