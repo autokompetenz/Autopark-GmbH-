@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
 const { prisma } = require('../lib/prisma.js');
-const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendLeadEmail } = require('../lib/mailer.js');
+const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendLeadEmail, sendAdminOrderNotificationEmail } = require('../lib/mailer.js');
 const { calculateMonthlyPayment, generatePaymentReference } = require('../lib/helpers.js');
 
 // Initialize Express app
@@ -884,6 +884,13 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
       items: cartItems.map(i => ({ car: i.car, unitPrice: i.car.price, quantity: i.quantity })),
       bank,
     }).catch(err => console.error('Order confirmation email error:', err)));
+
+    // Notify admin with full order details (non-blocking)
+    sendAdminOrderNotificationEmail({
+      customer: { firstName: req.user.firstName, lastName: req.user.lastName, email: req.user.email, phone: req.user.phone },
+      order: { ...order, createdAt: order.createdAt || new Date() },
+      items: cartItems.map(i => ({ car: i.car, unitPrice: i.car.price, quantity: i.quantity })),
+    }).catch(err => console.error('Admin order notification email error:', err));
   } catch (e) {
     console.error('Create order error:', e);
     res.status(500).json({ error: 'Erreur serveur' });
