@@ -270,17 +270,9 @@ export default function AdminCarForm() {
           <div style={{ display:'flex', flexDirection:'column', gap:16, marginBottom:24 }}>
             <div>
               <label style={{ display:'block', fontSize:11, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--text-3)', marginBottom:10 }}>Images *</label>
-              <input 
-                type="file" 
-                accept="image/*" 
-                multiple
-                onChange={handleImageChange}
-                id="images-input"
-                style={{ position:'absolute', left:'-9999px', width:'1px', height:'1px', opacity:0 }}
-              />
               <label 
-                htmlFor="images-input"
                 style={{ 
+                  position:'relative',
                   display:'flex', 
                   alignItems:'center', 
                   justifyContent:'center',
@@ -298,6 +290,14 @@ export default function AdminCarForm() {
                 onMouseOver={e => { e.currentTarget.style.borderColor='var(--red)'; e.currentTarget.style.background='var(--bg-card2)'; e.currentTarget.style.color='var(--text)'; }}
                 onMouseOut={e => { e.currentTarget.style.borderColor='var(--border-2)'; e.currentTarget.style.background='var(--red-bg)'; e.currentTarget.style.color='var(--text-2)'; }}
               >
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  multiple
+                  onChange={handleImageChange}
+                  id="images-input"
+                  style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0, cursor:'pointer', zIndex:1 }}
+                />
                 📷 {previews.length + existingImages.length > 0 ? `${previews.length + existingImages.length} / ${MAX_IMAGES} images` : 'Choisir des images'}
               </label>
             </div>
