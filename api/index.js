@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { createClient } = require('@supabase/supabase-js');
+const cloudinary = require('cloudinary').v2;
 const { prisma } = require('../lib/prisma.js');
 const { sendWelcomeEmail, sendOrderConfirmationEmail, sendOrderStatusUpdateEmail, sendLeadEmail, sendAdminOrderNotificationEmail } = require('../lib/mailer.js');
 const { calculateMonthlyPayment, generatePaymentReference } = require('../lib/helpers.js');
@@ -25,6 +26,13 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Configure multer for file uploads (memory storage for Vercel compatibility)
 const upload = multer({
@@ -51,13 +59,24 @@ async function uploadCarImages(files) {
   const results = await Promise.all(
     sorted.map(async (file, index) => {
       const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const fileName = `${Date.now()}-${index}-${safeName}`;
-      const { error } = await supabase.storage
-        .from('cars')
-        .upload(fileName, file.buffer, { contentType: file.mimetype });
-      if (error) throw error;
-      const { data: publicUrlData } = supabase.storage.from('cars').getPublicUrl(fileName);
-      return { index, url: publicUrlData.publicUrl };
+      const publicId = `autopark/cars/${Date.now()}-${index}-${safeName}`;
+
+      const url = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            public_id: publicId,
+            folder: 'autopark/cars',
+            resource_type: 'image',
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+        stream.end(file.buffer);
+      });
+
+      return { index, url };
     })
   );
 
