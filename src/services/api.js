@@ -58,7 +58,13 @@ export const cartAPI = {
   remove: (carId) => api.delete(`/cart/${carId}`),
 };
 export const orderAPI = {
-  create:         (d)    => api.post('/orders', d),
+  create:         (d) => {
+    const isForm = d instanceof FormData;
+    return api.post('/orders', d, isForm ? {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000,
+    } : undefined);
+  },
   getMy:          ()     => api.get('/orders/my'),
   getByNumber:    (num)  => api.get(`/orders/${num}`),
   track:          (num)  => api.get(`/orders/track/${num}`),

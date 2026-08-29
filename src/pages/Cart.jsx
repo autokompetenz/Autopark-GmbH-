@@ -12,9 +12,7 @@ const PAYMENT_OPTIONS = [
   { id:'full',    icon:'💎', labelKey:'payment_full',    subFr:'−5% de remise immédiate', subEn:'5% immediate discount', subDe:'5% Sofortrabatt' },
   { id:'deposit', icon:'🔑', labelKey:'payment_deposit', subFr:'25% maintenant, solde à livraison', subEn:'25% now, balance on delivery', subDe:'25% jetzt, Rest bei Lieferung' },
   { id:'monthly', icon:'📅', labelKey:'payment_monthly', subFr:'60 mensualités à 6%/an', subEn:'60 monthly payments at 6%/yr', subDe:'60 Raten à 6%/Jahr' },
-];
-
-const WARRANTY_OPTIONS = [
+];const WARRANTY_OPTIONS = [
   { id: 'none',    months: 0,  price: 0,   labelFr: 'Aucune garantie supplémentaire', labelEn: 'No additional warranty', labelDe: 'Keine zusätzliche Garantie' },
   { id: '24months', months: 24, price: 360, labelFr: 'Garantie 24 mois', labelEn: '24-month warranty', labelDe: '24 Monate Garantie' },
   { id: '36months', months: 36, price: 450, labelFr: 'Garantie 36 mois', labelEn: '36-month warranty', labelDe: '36 Monate Garantie' },
@@ -124,6 +122,7 @@ function CheckoutPanel({
   selectedWarranty, setSelectedWarranty,
   includeRegistration, setIncludeRegistration,
   selectedAdditionalServices, setSelectedAdditionalServices,
+  proofFile, setProofFile,
 }) {
   const l = lang || 'fr';
   
@@ -359,6 +358,73 @@ function CheckoutPanel({
             style={{ fontSize:16 }}
           />
         </div>
+
+        {/* Payment proof upload */}
+        <div style={{
+          padding:16, borderRadius:10,
+          border:`1.5px dashed ${proofFile ? 'var(--green)' : 'var(--border)'}`,
+          background: proofFile ? 'rgba(34,197,94,0.05)' : 'var(--bg-card2)',
+          transition:'all 0.2s',
+        }}>
+          <label style={{ display:'block', fontSize:12, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--text-3)', marginBottom:8 }}>
+            📎 {l==='fr'?'Preuve de virement (obligatoire)':l==='en'?'Bank transfer receipt (required)':l==='de'?'Überweisungsbeleg (erforderlich)':'Comprovante de transferência (obrigatório)'}
+          </label>
+          <p style={{ fontSize:12, color:'var(--text-3)', lineHeight:1.6, marginBottom:10 }}>
+            {l==='fr'
+              ? 'Après avoir effectué votre virement aux coordonnées bancaires indiquées, joignez la preuve (capture, PDF ou photo) avant de valider votre commande.'
+              : l==='en'
+              ? 'After making your transfer to the bank details shown, attach the receipt (screenshot, PDF or photo) before submitting your order.'
+              : l==='de'
+              ? 'Nach der Überweisung auf die angegebenen Bankdaten fügen Sie den Beleg (Screenshot, PDF oder Foto) bei, bevor Sie Ihre Bestellung absenden.'
+              : 'Após efetuar a transferência para os dados bancários indicados, anexe o comprovante (captura, PDF ou foto) antes de enviar seu pedido.'}
+          </p>
+          <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+            <input
+              type="file"
+              accept="image/*,.pdf"
+              id="payment-proof-input"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (f.size > 10 * 1024 * 1024) {
+                  addToast(f.name + ' ' + (l==='fr'?'trop volumineux (max 10MB)':l==='en'?'too large (max 10MB)':l==='de'?'zu groß (max 10MB)':'muito grande (máx 10MB)'), 'error');
+                  e.target.value = '';
+                  return;
+                }
+                setProofFile(f);
+              }}
+              style={{ display:'none' }}
+            />
+            <button
+              type="button"
+              onClick={() => document.getElementById('payment-proof-input')?.click()}
+              className="btn-ghost"
+              style={{
+                borderColor: proofFile ? 'var(--green)' : 'var(--border)',
+                color: proofFile ? 'var(--green)' : 'var(--text-3)',
+                padding:'10px 16px', fontSize:13,
+              }}
+            >
+              {proofFile ? '✓ ' : '+ '}{l==='fr'?'Choisir le fichier':l==='en'?'Choose file':l==='de'?'Datei wählen':'Escolher arquivo'}
+            </button>
+            {proofFile && (
+              <div style={{ minWidth:0, display:'flex', alignItems:'center', gap:10, flex:1 }}>
+                <p style={{ fontSize:13, color:'var(--green)', fontWeight:600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                  {proofFile.name}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setProofFile(null); document.getElementById('payment-proof-input').value = ''; }}
+                  style={{ background:'none', border:'none', color:'#DC2626', cursor:'pointer', fontSize:14, flexShrink:0 }}
+                  aria-label="Retirer"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         <button type="submit" disabled={placing} className="btn-primary"
           style={{ justifyContent:'center', padding:'15px 20px', fontSize:14, width:'100%' }}>
           {placing ? '⏳ ...' : '✓ ' + t('place_order', l)}
@@ -386,6 +452,7 @@ export default function Cart() {
   const [shippingAddress, setShippingAddress] = useState('');
   const [notes, setNotes] = useState('');
   const [placing, setPlacing] = useState(false);
+  const [proofFile, setProofFile] = useState(null);
 
   useEffect(() => { fetchCart(); }, []);
 
@@ -402,6 +469,10 @@ export default function Cart() {
       addToast(t('delivery_addr', lang).replace(' *', '') + ' ' + (lang === 'fr' ? 'requis' : 'required'), 'warning');
       return;
     }
+    if (!proofFile) {
+      addToast(lang==='fr'?'Veuillez joindre la preuve de virement avant d\'envoyer la commande':lang==='en'?'Please attach the bank transfer receipt before submitting your order':lang==='de'?'Bitte fügen Sie vor dem Senden der Bestellung den Überweisungsbeleg bei':'Anexe o comprovante de transferência antes de enviar o pedido', 'warning');
+      return;
+    }
     try {
       setPlacing(true);
       const warrantyOption = WARRANTY_OPTIONS.find(w => w.id === selectedWarranty);
@@ -413,22 +484,23 @@ export default function Cart() {
           label: service.labelFr
         };
       });
-      const orderData = {
-        paymentType: selectedPayment,
-        shippingAddress,
-        notes,
-        warranty: selectedWarranty !== 'none' ? {
-          id: selectedWarranty,
-          months: warrantyOption?.months,
-          price: warrantyOption?.price
-        } : null,
-        registration: includeRegistration ? {
-          id: REGISTRATION_SERVICE.id,
-          price: REGISTRATION_SERVICE.price
-        } : null,
-        additionalServices: additionalServicesData.length > 0 ? additionalServicesData : null
-      };
-      const { data } = await orderAPI.create(orderData);
+      const formData = new FormData();
+      formData.append('paymentType', selectedPayment);
+      formData.append('shippingAddress', shippingAddress);
+      formData.append('notes', notes || '');
+      formData.append('warranty', selectedWarranty !== 'none' ? JSON.stringify({
+        id: selectedWarranty,
+        months: warrantyOption?.months,
+        price: warrantyOption?.price
+      }) : '');
+      formData.append('registration', includeRegistration ? JSON.stringify({
+        id: REGISTRATION_SERVICE.id,
+        price: REGISTRATION_SERVICE.price
+      }) : '');
+      formData.append('additionalServices', additionalServicesData.length > 0 ? JSON.stringify(additionalServicesData) : '');
+      formData.append('paymentProof', proofFile);
+      const { data } = await orderAPI.create(formData);
+      setProofFile(null);
       fetchCart();
       navigate(`/order-confirm/${data.orderNumber}`);
     } catch (err) {
@@ -534,6 +606,8 @@ export default function Cart() {
                 setIncludeRegistration={setIncludeRegistration}
                 selectedAdditionalServices={selectedAdditionalServices}
                 setSelectedAdditionalServices={setSelectedAdditionalServices}
+                proofFile={proofFile}
+                setProofFile={setProofFile}
               />
             </div>
           </div>

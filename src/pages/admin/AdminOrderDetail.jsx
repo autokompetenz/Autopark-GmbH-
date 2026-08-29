@@ -138,6 +138,14 @@ export default function AdminOrderDetail() {
                 <span style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize:28, color:'var(--text)', letterSpacing:'-0.02em' }}>{formatEuro(order.totalPrice)}</span>
               </div>
             </div>
+            {order.paymentProofUrl && (
+              <div style={{ marginTop:16, paddingTop:16, borderTop:'1px solid var(--border)' }}>
+                <p style={{ fontSize:11, fontWeight:700, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--red)', marginBottom:8 }}>Preuve de virement</p>
+                <a href={order.paymentProofUrl} target="_blank" rel="noopener noreferrer" style={{ display:'inline-block' }}>
+                  <img src={order.paymentProofUrl} alt="Preuve de virement" style={{ width:180, height:'auto', maxHeight:140, objectFit:'cover', borderRadius:8, border:'1px solid var(--border)' }} />
+                </a>
+              </div>
+            )}
           </div>
 
           {order.tracking?.length > 0 && (

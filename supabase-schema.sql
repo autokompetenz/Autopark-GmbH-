@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS "Order" (
   "status"          "OrderStatus" DEFAULT 'pending',
   "notes"           TEXT,
   "shippingAddress" TEXT,
+  "paymentProofUrl" TEXT,
   "createdAt"       TIMESTAMP DEFAULT NOW(),
   "updatedAt"       TIMESTAMP DEFAULT NOW()
 );

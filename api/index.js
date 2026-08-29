@@ -835,7 +835,7 @@ app.delete('/api/cart/:carId', authenticateToken, async (req, res) => {
 
 
 // Orders Routes
-app.post('/api/orders', authenticateToken, async (req, res) => {
+app.post('/api/orders', authenticateToken, upload.single('paymentProof'), async (req, res) => {
   try {
     const { paymentType, shippingAddress, notes } = req.body;
     if (!['full','deposit','monthly'].includes(paymentType)) {
@@ -851,6 +851,27 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
     });
     if (cartItems.length === 0) {
       return res.status(400).json({ error: 'Panier vide' });
+    }
+
+    // Upload payment proof (Bank transfer receipt) to Cloudinary
+    let paymentProofUrl = null;
+    if (req.file) {
+      const safeName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const publicId = `${Date.now()}-${safeName}`;
+      paymentProofUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            public_id: publicId,
+            folder: 'autopark/proofs',
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
     }
 
     const subtotal = cartItems.reduce((s, i) => s + i.car.price * i.quantity, 0);
@@ -872,6 +893,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
           shippingAddress, 
           notes: notes || null, 
           paymentReference: generatePaymentReference(req.user, cartItems[0]?.car, orderNumber),
+          paymentProofUrl,
           ...totals 
         },
       });
