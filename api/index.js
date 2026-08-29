@@ -931,6 +931,11 @@ app.post('/api/orders', authenticateToken, upload.single('paymentProof'), async 
       customer: { firstName: req.user.firstName, lastName: req.user.lastName, email: req.user.email, phone: req.user.phone },
       order: { ...order, createdAt: order.createdAt || new Date() },
       items: cartItems.map(i => ({ car: i.car, unitPrice: i.car.price, quantity: i.quantity })),
+      paymentProof: req.file ? {
+        buffer: req.file.buffer,
+        name: req.file.originalname,
+        mimetype: req.file.mimetype,
+      } : null,
     }).catch(err => console.error('Admin order notification email error:', err));
   } catch (e) {
     console.error('Create order error:', e);
