@@ -8,6 +8,8 @@ DO $$ BEGIN CREATE TYPE "Transmission" AS ENUM ('Manuelle', 'Automatique'); EXCE
 DO $$ BEGIN CREATE TYPE "Category" AS ENUM ('Berline', 'SUV', 'Citadine', 'Break', 'Coupe', 'Monospace', 'Utilitaire', 'FourX4'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE "PaymentType" AS ENUM ('full', 'deposit', 'monthly'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN CREATE TYPE "OrderStatus" AS ENUM ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE "InstallmentType" AS ENUM ('full', 'deposit', 'monthly', 'balance'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE "PaymentStatus" AS ENUM ('pending', 'paid', 'late', 'cancelled'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Tables
 CREATE TABLE IF NOT EXISTS "User" (
@@ -80,10 +82,14 @@ CREATE TABLE IF NOT EXISTS "Order" (
   "status"          "OrderStatus" DEFAULT 'pending',
   "notes"           TEXT,
   "shippingAddress" TEXT,
+  "paymentReference" TEXT,
   "paymentProofUrl" TEXT,
   "createdAt"       TIMESTAMP DEFAULT NOW(),
   "updatedAt"       TIMESTAMP DEFAULT NOW()
 );
+
+-- Ensure paymentReference exists on Order (compatibility with Prisma)
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "paymentReference" TEXT;
 
 CREATE TABLE IF NOT EXISTS "OrderItem" (
   "id"        SERIAL PRIMARY KEY,
@@ -111,6 +117,22 @@ CREATE TABLE IF NOT EXISTS "Cart" (
   "createdAt"   TIMESTAMP DEFAULT NOW(),
   UNIQUE("userId", "carId")
 );
+
+CREATE TABLE IF NOT EXISTS "Payment" (
+  "id"        SERIAL PRIMARY KEY,
+  "orderId"   INT NOT NULL REFERENCES "Order"("id") ON DELETE CASCADE,
+  "type"      "InstallmentType" NOT NULL,
+  "amount"    FLOAT NOT NULL,
+  "dueDate"   TIMESTAMP,
+  "paidAt"    TIMESTAMP,
+  "status"    "PaymentStatus" DEFAULT 'pending',
+  "reference" TEXT,
+  "note"      TEXT,
+  "createdAt" TIMESTAMP DEFAULT NOW(),
+  "updatedAt" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS "Payment_orderId_idx" ON "Payment"("orderId");
 
 -- Storage
 INSERT INTO storage.buckets (id, name, public) VALUES ('cars', 'cars', true)

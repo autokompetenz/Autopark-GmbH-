@@ -100,6 +100,7 @@ export default function CarCard({ car, index = 0 }) {
             {car.monthlyPayment && (
               <div style={{ fontSize:12, color:'var(--text-3)', marginTop:4, fontWeight:400 }}>
                 {t('or', l)} {formatEuro(car.monthlyPayment)}{t('per_month', l)}
+                <span style={{ opacity:0.7 }}> ({l==='fr'?'ap. acompte 25%':l==='en'?'after 25% dep.':l==='de'?'n. 25% Anzahlung':'tras señal 25%'})</span>
               </div>
             )}
           </div>

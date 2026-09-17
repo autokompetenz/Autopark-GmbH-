@@ -51,6 +51,20 @@ enum OrderStatus {
   cancelled
 }
 
+enum InstallmentType {
+  full
+  deposit
+  monthly
+  balance
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  late
+  cancelled
+}
+
 model User {
   id            Int      @id @default(autoincrement())
   username      String   @unique
@@ -136,6 +150,7 @@ model Order {
   user     User           @relation(fields: [userId], references: [id])
   items    OrderItem[]
   tracking OrderTracking[]
+  payments Payment[]
 }
 
 model OrderItem {
@@ -159,6 +174,24 @@ model OrderTracking {
 
   order Order @relation(fields: [orderId],   references: [id], onDelete: Cascade)
   admin User? @relation(fields: [updatedBy], references: [id])
+}
+
+model Payment {
+  id        Int             @id @default(autoincrement())
+  orderId   Int
+  type      InstallmentType
+  amount    Float
+  dueDate   DateTime?
+  paidAt    DateTime?
+  status    PaymentStatus   @default(pending)
+  reference String?
+  note      String?         @db.Text
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
 }
 
 model Cart {

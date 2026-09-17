@@ -107,7 +107,7 @@ function parseCarFormBody(data) {
     featured: data.featured === 'true' || data.featured === true,
     promotional: data.promotional === 'true' || data.promotional === true,
     isActive: data.isActive !== 'false' && data.isActive !== false,
-    monthlyPayment: Number.isFinite(price) && price > 0 ? calculateMonthlyPayment(price) : null,
+    monthlyPayment: Number.isFinite(price) && price > 0 ? calculateMonthlyPayment(price * 0.75) : null,
   };
   for (let i = 1; i <= 20; i++) {
     const key = i === 1 ? 'imageUrl' : `imageUrl${i}`;
@@ -157,13 +157,16 @@ function calculateOrderTotals(subtotal, paymentType) {
       monthlyDuration: null 
     };
   } else if (paymentType === 'monthly') {
+    // Acompte 25% à régler immédiatement, le solde (75%) est financé sur 60 mois à 6%/an
     const monthlyDuration = 60;
+    const depositAmount = discountedTotal * 0.25;
+    const financedAmount = discountedTotal - depositAmount;
     const r = 0.06 / 12;
-    const monthlyAmount = Math.round((discountedTotal * r * Math.pow(1 + r, monthlyDuration)) / (Math.pow(1 + r, monthlyDuration) - 1));
+    const monthlyAmount = Math.round((financedAmount * r * Math.pow(1 + r, monthlyDuration)) / (Math.pow(1 + r, monthlyDuration) - 1));
     return { 
       totalPrice: discountedTotal, 
       discountAmount, 
-      depositAmount: null, 
+      depositAmount, 
       monthlyAmount, 
       monthlyDuration 
     };
@@ -910,6 +913,28 @@ app.post('/api/orders', authenticateToken, upload.single('paymentProof'), async 
       await tx.orderTracking.create({
         data: { orderId: newOrder.id, status: 'pending', comment: 'Commande reçue' },
       });
+
+      // Payment schedule (échéancier) based on payment method
+      const now = new Date();
+      const schedule = [];
+      if (paymentType === 'monthly') {
+        schedule.push({ orderId: newOrder.id, type: 'deposit', amount: totals.depositAmount, dueDate: now });
+        const duration = Number(totals.monthlyDuration) || 0;
+        for (let i = 1; i <= duration; i++) {
+          const d = new Date(now);
+          d.setMonth(d.getMonth() + i);
+          schedule.push({ orderId: newOrder.id, type: 'monthly', amount: totals.monthlyAmount, dueDate: d });
+        }
+      } else if (paymentType === 'deposit') {
+        schedule.push({ orderId: newOrder.id, type: 'deposit', amount: totals.depositAmount, dueDate: now });
+        const balance = subtotal - totals.depositAmount;
+        schedule.push({ orderId: newOrder.id, type: 'balance', amount: balance, dueDate: null });
+      } else {
+        schedule.push({ orderId: newOrder.id, type: 'full', amount: totals.totalPrice, dueDate: now });
+      }
+      if (schedule.length) {
+        await tx.payment.createMany({ data: schedule });
+      }
       
       await tx.cart.deleteMany({ where: { userId: req.user.id } });
       return newOrder;
@@ -999,7 +1024,8 @@ app.get('/api/orders/my', authenticateToken, async (req, res) => {
       where: { userId: req.user.id },
       include: { 
         items: { include: { car: true } },
-        tracking: true
+        tracking: true,
+        payments: true
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -1007,7 +1033,8 @@ app.get('/api/orders/my', authenticateToken, async (req, res) => {
     const transformedOrders = orders.map(order => ({
       ...order,
       items: order.items || [],
-      tracking: order.tracking || []
+      tracking: order.tracking || [],
+      payments: order.payments || []
     }));
     
     res.json(transformedOrders);
@@ -1037,7 +1064,8 @@ app.get('/api/orders/:id', authenticateToken, async (req, res) => {
         tracking: { 
           include: { admin: { select: { firstName:true, lastName:true } } },
           orderBy: { createdAt: 'desc' }
-        }
+        },
+        payments: { orderBy: { dueDate: 'asc' } }
       },
     });
 
@@ -1062,7 +1090,8 @@ app.get('/api/orders/track/:orderNumber', async (req, res) => {
         tracking: { 
           include: { admin: { select: { firstName:true, lastName:true } } },
           orderBy: { createdAt: 'desc' }
-        }
+        },
+        payments: { orderBy: { dueDate: 'asc' } }
       },
     });
 
@@ -1120,6 +1149,64 @@ app.patch('/api/orders/:id', authenticateToken, requireAdmin, async (req, res) =
     res.json({ success: true, order, emailSent });
   } catch (e) {
     console.error('PATCH /api/orders/:id ERROR:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Admin: add a payment record to an order (acompte, mensualité, solde, total)
+app.post('/api/orders/:id/payments', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type, amount, dueDate, reference, note } = req.body;
+    const validTypes = ['full', 'deposit', 'monthly', 'balance'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ error: 'Type de paiement invalide' });
+    }
+    const parsedAmount = Number(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      return res.status(400).json({ error: 'Montant invalide' });
+    }
+    const order = await prisma.order.findUnique({ where: { id: parseInt(id) } });
+    if (!order) {
+      return res.status(404).json({ error: 'Commande non trouvée' });
+    }
+    const payment = await prisma.payment.create({
+      data: {
+        orderId: order.id,
+        type,
+        amount: parsedAmount,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        status: 'pending',
+        reference: reference || null,
+        note: note || null,
+      },
+    });
+    res.status(201).json({ success: true, payment });
+  } catch (e) {
+    console.error('POST /api/orders/:id/payments ERROR:', e);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Admin: update a payment status (validate as paid, mark late, cancel...)
+app.patch('/api/admin/payments/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const validStatuses = ['pending', 'paid', 'late', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Statut de paiement invalide' });
+    }
+    const payment = await prisma.payment.update({
+      where: { id: parseInt(id) },
+      data: {
+        status,
+        paidAt: status === 'paid' ? new Date() : status === 'pending' ? null : undefined,
+      },
+    });
+    res.json({ success: true, payment });
+  } catch (e) {
+    console.error('PATCH /api/admin/payments/:id ERROR:', e);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
@@ -1393,12 +1480,13 @@ app.get('/api/simulation', async (req, res) => {
       return res.status(400).json({ error: 'Salaire invalide' });
     }
     const maxMonthly = salary * 0.3;
-    // Find cars affordable via monthly payment (60 months, 6%/year)
+    // Find cars affordable via monthly payment (60 months, 6%/year, 25% deposit financed over 75%)
     const r = 0.06 / 12;  
     const months = 60;
-    // Max affordable price from monthly budget: price = maxMonthly * (((1+r)^n - 1) / (r*(1+r)^n))
+    // Max affordable price from monthly budget: price = maxMonthly * (((1+r)^n - 1) / (r*(1+r)^n)) / 0.75
+    // (seuls 75% du prix sont financés, les 25% sont réglés en acompte)
     const factor = (Math.pow(1 + r, months) - 1) / (r * Math.pow(1 + r, months));
-    const maxAffordablePrice = maxMonthly * factor;
+    const maxAffordablePrice = (maxMonthly * factor) / 0.75;
 
     const cars = await prisma.car.findMany({
       where: { isActive: true, price: { lte: maxAffordablePrice } },

@@ -6,7 +6,7 @@ import { formatEuro, formatDate } from '../../utils/helpers';
 import { StatusBadge, Loader } from '../../components/UI';
 
 const STATUS_FR = { pending:'En attente', confirmed:'Confirmée', processing:'En traitement', shipped:'Expédiée', delivered:'Livrée', cancelled:'Annulée' };
-const PAYMENT_FR = { full:'Intégral', deposit:'Acompte', monthly:'Mensualités' };
+const PAYMENT_FR = { full:'Intégral', deposit:'Acompte', monthly:'Acompte + Mensualités' };
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);

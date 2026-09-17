@@ -18,8 +18,11 @@ export function calculateOrderTotals(subtotal, paymentType) {
     case 'deposit':
       return { total: subtotal, discount: null, deposit: subtotal * 0.25, monthly: null };
     case 'monthly': {
-      const monthly = calculateMonthlyPayment(subtotal);
-      return { total: monthly * 60, discount: null, deposit: null, monthly };
+      // Acompte 25% à régler immédiatement, le solde (75%) est financé sur 60 mois à 6%/an
+      const deposit = subtotal * 0.25;
+      const financed = subtotal - deposit;
+      const monthly = calculateMonthlyPayment(financed);
+      return { total: subtotal, discount: null, deposit, monthly };
     }
     default:
       return { total: subtotal, discount: null, deposit: null, monthly: null };
@@ -32,7 +35,7 @@ export const STATUS_LABELS = {
 };
 export const STATUS_STEPS = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
 export const PAYMENT_LABELS = {
-  full: 'Paiement intégral (-5%)', deposit: 'Acompte 25%', monthly: 'Mensualités 60 mois',
+  full: 'Paiement intégral (-5%)', deposit: 'Acompte 25%', monthly: 'Acompte 25% + 60 mensualités',
 };
 
 export function getInitials(firstName, lastName) {

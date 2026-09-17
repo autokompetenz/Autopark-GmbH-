@@ -244,7 +244,7 @@ export default function CarDetails() {
               </span>
               {car.monthlyPayment && (
                 <span style={{ fontSize: 15, color: C.text3, fontWeight: 500 }}>
-                  {t('or', lang)} {formatEuro(car.monthlyPayment)}{t('per_month', lang)}
+                  {t('or', lang)} {formatEuro(car.monthlyPayment)}{t('per_month', lang)} ({lang==='fr'?'après acompte 25%':lang==='en'?'after 25% deposit':lang==='de'?'nach 25% Anzahlung':'tras señal 25%'})
                 </span>
               )}
             </div>

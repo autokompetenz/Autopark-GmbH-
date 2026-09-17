@@ -5,7 +5,7 @@ import { formatEuro, formatDate } from '../../utils/helpers';
 import { StatusBadge, Loader } from '../../components/UI';
 
 const STATUS_LABELS = { pending:'En attente', confirmed:'Confirmée', processing:'En traitement', shipped:'Expédiée', delivered:'Livrée', cancelled:'Annulée' };
-const PAYMENT_FR = { full:'Intégral (-5%)', deposit:'Acompte 25%', monthly:'Mensualités' };
+const PAYMENT_FR = { full:'Intégral (-5%)', deposit:'Acompte 25%', monthly:'Acompte 25% + Mensualités' };
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);

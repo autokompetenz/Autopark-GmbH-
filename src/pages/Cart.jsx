@@ -11,7 +11,7 @@ import { useBreakpoint } from '../hooks/useBreakpoint';
 const PAYMENT_OPTIONS = [
   { id:'full',    icon:'💎', labelKey:'payment_full',    subFr:'−5% de remise immédiate', subEn:'5% immediate discount', subDe:'5% Sofortrabatt' },
   { id:'deposit', icon:'🔑', labelKey:'payment_deposit', subFr:'25% maintenant, solde à livraison', subEn:'25% now, balance on delivery', subDe:'25% jetzt, Rest bei Lieferung' },
-  { id:'monthly', icon:'📅', labelKey:'payment_monthly', subFr:'60 mensualités à 6%/an', subEn:'60 monthly payments at 6%/yr', subDe:'60 Raten à 6%/Jahr' },
+  { id:'monthly', icon:'📅', labelKey:'payment_monthly', subFr:'Acompte 25% puis 60 mensualités à 6%/an', subEn:'25% deposit then 60 monthly payments at 6%/yr', subDe:'25% Anzahlung, dann 60 Raten à 6%/Jahr' },
 ];const WARRANTY_OPTIONS = [
   { id: 'none',    months: 0,  price: 0,   labelFr: 'Aucune garantie supplémentaire', labelEn: 'No additional warranty', labelDe: 'Keine zusätzliche Garantie' },
   { id: '24months', months: 24, price: 360, labelFr: 'Garantie 24 mois', labelEn: '24-month warranty', labelDe: '24 Monate Garantie' },
@@ -307,19 +307,29 @@ function CheckoutPanel({
               <span>{t('discount', l)}</span><span>− {formatEuro(totals.discount)}</span>
             </div>
           )}
+          {(selectedPayment==='monthly' || selectedPayment==='deposit') && totals.deposit && (
+            <div style={{ display:'flex', justifyContent:'space-between' }}>
+              <span style={{ color:'var(--text-3)' }}>
+                {selectedPayment==='monthly'
+                  ? (l==='fr'?'Acompte (25%) à régler immédiatement':l==='en'?'Deposit (25%) due now':l==='de'?'Anzahlung (25%) sofort fällig':'Depósito (25%) a pagar ahora')
+                  : t('deposit_due', l)}
+              </span>
+              <span style={{ color:'var(--red)', fontWeight:700 }}>{formatEuro(totals.deposit)}</span>
+            </div>
+          )}
           {selectedPayment==='monthly' && totals.monthly && (
             <div style={{ display:'flex', justifyContent:'space-between' }}>
-              <span style={{ color:'var(--text-3)' }}>{t('monthly_rate', l)}</span>
+              <span style={{ color:'var(--text-3)' }}>{t('monthly_rate', l)} × 60</span>
               <span style={{ color:'var(--red)', fontWeight:700 }}>{formatEuro(totals.monthly)}{t('per_month', l)}</span>
             </div>
           )}
           <div style={{ height:1, background:'var(--border)', margin:'4px 0' }} />
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
             <span style={{ fontSize:14, color:'var(--text-3)' }}>
-              {selectedPayment==='deposit' ? t('deposit_due', l) : selectedPayment==='monthly' ? t('contract_total', l) : t('total', l)}
+              {(selectedPayment==='deposit' || selectedPayment==='monthly') ? t('deposit_due', l) : t('total', l)}
             </span>
             <span style={{ fontFamily:"'Outfit',sans-serif", fontWeight:900, fontSize:28, color:'var(--text)', letterSpacing:'-0.02em' }}>
-              {selectedPayment==='deposit' ? formatEuro(totals.deposit) : formatEuro(totals.total)}
+              {(selectedPayment==='deposit' || selectedPayment==='monthly') ? formatEuro(totals.deposit) : formatEuro(totals.total)}
             </span>
           </div>
         </div>

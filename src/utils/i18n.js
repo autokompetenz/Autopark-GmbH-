@@ -48,7 +48,7 @@ export const translations = {
   view_vehicle:     { fr:'Voir le véhicule',   en:'View Vehicle',      de:'Fahrzeug ansehen',  es:'Ver vehículo',     it:'Vedi veicolo',     pt:'Ver veículo',      ro:'Vezi vehiculul' },
   payment_full:     { fr:'Paiement intégral',  en:'Full Payment',      de:'Vollzahlung',       es:'Pago completo',    it:'Pagamento completo', pt:'Pagamento integral', ro:'Plată integrală' },
   payment_deposit:  { fr:'Acompte 25%',        en:'25% Deposit',       de:'Anzahlung 25%',     es:'Señal 25%',        it:'Acconto 25%',      pt:'Entrada 25%',      ro:'Acont 25%' },
-  payment_monthly:  { fr:'Mensualités',        en:'Monthly Payments',  de:'Ratenzahlung',      es:'Cuotas mensuales', it:'Rate mensili',     pt:'Parcelas mensais', ro:'Rate lunare' },
+  payment_monthly:  { fr:'Acompte 25% + Mensualités', en:'25% Deposit + Monthly Payments', de:'25% Anzahlung + Raten', es:'Señal 25% + Cuotas', it:'Acconto 25% + Rate', pt:'Entrada 25% + Parcelas', ro:'Acont 25% + Rate lunare' },
   discount_5:       { fr:'-5% de réduction',   en:'5% discount',       de:'-5% Rabatt',        es:'5% de descuento',  it:'5% di sconto',     pt:'5% de desconto',   ro:'Reducere 5%' },
   months_60:        { fr:'60 mois',            en:'60 months',         de:'60 Monate',         es:'60 meses',         it:'60 mesi',          pt:'60 meses',         ro:'60 de luni' },
   search_ph:        { fr:'Rechercher une voiture...', en:'Search a car...', de:'Auto suchen...', es:'Buscar un coche...', it:'Cerca un auto...', pt:'Buscar um carro...', ro:'Caută o mașină...' },

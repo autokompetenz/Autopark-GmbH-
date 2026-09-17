@@ -50,7 +50,7 @@ async function main() {
 
   for (const car of cars) {
     await prisma.car.create({
-      data: { ...car, monthlyPayment: pmt(car.price), isActive: true },
+      data: { ...car, monthlyPayment: pmt(car.price * 0.75), isActive: true },
     });
   }
 

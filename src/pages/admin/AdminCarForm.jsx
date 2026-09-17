@@ -359,7 +359,7 @@ export default function AdminCarForm() {
             ))}
           </div>
           <p style={{ fontSize:12, color:'var(--text-3)', marginTop:14, fontWeight:500, lineHeight:1.6 }}>
-            💡 La mensualité est calculée automatiquement (6%/an, 60 mois).
+            💡 La mensualité est calculée automatiquement sur 75% du prix (après acompte de 25%), 6%/an, 60 mois.
           </p>
         </Section>
 

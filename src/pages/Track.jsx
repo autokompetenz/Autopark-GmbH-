@@ -20,12 +20,12 @@ const STATUS_LABELS_ML = {
 };
 
 const PAYMENT_ML = {
-  fr:{ full:'Paiement intégral (-5%)',   deposit:'Acompte 25%',   monthly:'Mensualités 60 mois' },
-  en:{ full:'Full payment (-5%)',         deposit:'25% deposit',   monthly:'60 monthly payments' },
-  de:{ full:'Vollzahlung (-5%)',          deposit:'Anzahlung 25%', monthly:'60 Raten' },
-  es:{ full:'Pago completo (-5%)',        deposit:'Señal 25%',     monthly:'60 cuotas mensuales' },
-  it:{ full:'Pagamento completo (-5%)',   deposit:'Acconto 25%',   monthly:'60 rate mensili' },
-  pt:{ full:'Pagamento integral (-5%)',   deposit:'Entrada 25%',   monthly:'60 parcelas mensais' },
+  fr:{ full:'Paiement intégral (-5%)',   deposit:'Acompte 25%',   monthly:'Acompte 25% + 60 mensualités' },
+  en:{ full:'Full payment (-5%)',         deposit:'25% deposit',   monthly:'25% deposit + 60 monthly payments' },
+  de:{ full:'Vollzahlung (-5%)',          deposit:'Anzahlung 25%', monthly:'25% Anzahlung + 60 Raten' },
+  es:{ full:'Pago completo (-5%)',        deposit:'Señal 25%',     monthly:'Señal 25% + 60 cuotas' },
+  it:{ full:'Pagamento completo (-5%)',   deposit:'Acconto 25%',   monthly:'Acconto 25% + 60 rate' },
+  pt:{ full:'Pagamento integral (-5%)',   deposit:'Entrada 25%',   monthly:'Entrada 25% + 60 parcelas' },
 };
 
 export default function Track() {
@@ -88,7 +88,31 @@ export default function Track() {
     progress:  { fr:'Progression',         en:'Progress',          de:'Fortschritt',           es:'Progreso',               it:'Avanzamento',            pt:'Progresso' },
     contact:   { fr:'Nous contacter',      en:'Contact us',        de:'Kontaktieren',          es:'Contáctenos',            it:'Contattateci',           pt:'Contacte-nos' },
     searching: { fr:'Recherche...',        en:'Searching...',      de:'Suche...',              es:'Buscando...',            it:'Ricerca...',             pt:'Pesquisando...' },
+    schedule:  { fr:'Échéancier de paiement', en:'Payment schedule', de:'Zahlungsplan',      es:'Calendario de pago',     it:'Piano di pagamento',     pt:'Cronograma de pagamento' },
+    due:       { fr:'Échéance',            en:'Due date',          de:'Fällig am',             es:'Vencimiento',            it:'Scadenza',               pt:'Vencimento' },
+    amount:    { fr:'Montant',             en:'Amount',            de:'Betrag',                es:'Importe',                it:'Importo',                pt:'Valor' },
+    status:    { fr:'Statut',              en:'Status',            de:'Status',                es:'Estado',                 it:'Stato',                  pt:'Estado' },
+    onDelivery:{ fr:'À la livraison',      en:'On delivery',       de:'Bei Lieferung',         es:'A la entrega',           it:'Alla consegna',          pt:'Na entrega' },
+    remaining: { fr:'Restant à payer',     en:'Remaining balance', de:'Offener Betrag',        es:'Saldo pendiente',        it:'Saldo residuo',          pt:'Saldo restante' },
   };
+
+  const TYPE_LABELS = {
+    deposit: { fr:'Acompte', en:'Deposit', de:'Anzahlung', es:'Señal', it:'Acconto', pt:'Entrada' },
+    monthly: { fr:'Mensualité', en:'Monthly payment', de:'Rate', es:'Cuota', it:'Rata', pt:'Parcela' },
+    balance: { fr:'Solde', en:'Balance', de:'Restbetrag', es:'Saldo', it:'Saldo', pt:'Saldo' },
+    full:    { fr:'Total', en:'Full amount', de:'Gesamtbetrag', es:'Total', it:'Totale', pt:'Total' },
+  };
+  const STATUS_LABELS = {
+    pending:   { fr:'À payer', en:'Pending', de:'Ausstehend', es:'Pendiente', it:'In attesa', pt:'Pendente' },
+    paid:      { fr:'Payé', en:'Paid', de:'Bezahlt', es:'Pagado', it:'Pagato', pt:'Pago' },
+    late:      { fr:'En retard', en:'Late', de:'Überfällig', es:'Atrasado', it:'In ritardo', pt:'Em atraso' },
+    cancelled: { fr:'Annulé', en:'Cancelled', de:'Storniert', es:'Cancelado', it:'Annullato', pt:'Cancelado' },
+  };
+
+  const payments = (order?.payments || []).sort((a,b) => (a.dueDate||'').localeCompare(b.dueDate||''));
+  const remaining = payments.filter(p => p.status !== 'paid' && p.status !== 'cancelled').reduce((s,p) => s + p.amount, 0);
+
+  const statusColor = { pending:'var(--text-3)', paid:'var(--green)', late:'#EF4444', cancelled:'var(--text-3)' };
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)', paddingTop:72 }}>
@@ -227,6 +251,52 @@ export default function Track() {
             {/* Bank details for transfer */}
             {bank && (bank.iban || order.paymentReference) && (
               <BankDetails bank={bank} reference={order.paymentReference} />
+            )}
+
+            {/* Payment schedule */}
+            {payments.length > 0 && (
+              <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:12, padding: isMobile ? 18 : 28, boxShadow:'var(--shadow-sm)' }}>
+                <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:18 }}>
+                  <p style={{ fontSize:11, fontWeight:800, letterSpacing:'0.3em', textTransform:'uppercase', color:'var(--text-3)' }}>{L.schedule[l]}</p>
+                  <p style={{ fontSize:13, fontWeight:800, color:'var(--green)' }}>
+                    {L.remaining[l].toLowerCase()} : {formatEuro(remaining)}
+                  </p>
+                </div>
+                <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                  {payments.map((p, i) => (
+                    <div key={p.id} style={{
+                      display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:8,
+                      padding:'10px 12px', borderRadius:8,
+                      background:i%2===0?'transparent':'var(--bg-card2)',
+                      border:'1px solid var(--border)', opacity:p.status==='cancelled'?0.55:1,
+                    }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:10, minWidth:0 }}>
+                        <span style={{ fontFamily:'monospace', fontSize:12, color:'var(--text-3)', flexShrink:0 }}>#{String(i+1).padStart(2,'0')}</span>
+                        <div style={{ minWidth:0 }}>
+                          <p style={{ fontWeight:700, color:'var(--text)', fontSize:14 }}>
+                            {(TYPE_LABELS[p.type]||{})[l] || p.type}
+                            {p.amount === order.depositAmount && p.type==='deposit' && ' (25%)'}
+                          </p>
+                          <p style={{ fontSize:12, color:'var(--text-3)', marginTop:2 }}>
+                            {p.dueDate ? formatDate(p.dueDate) : L.onDelivery[l]}
+                          </p>
+                        </div>
+                      </div>
+                      <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                        <p style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:16, color:'var(--red)', flexShrink:0 }}>{formatEuro(p.amount)}</p>
+                        <span style={{
+                          fontSize:11, fontWeight:800, letterSpacing:'0.06em', textTransform:'uppercase', flexShrink:0,
+                          color:statusColor[p.status]||'var(--text-3)',
+                          border:`1px solid ${statusColor[p.status]||'var(--border)'}`,
+                          borderRadius:999, padding:'3px 10px',
+                        }}>
+                          {(STATUS_LABELS[p.status]||{})[l] || p.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* History timeline */}

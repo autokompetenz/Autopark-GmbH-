@@ -72,6 +72,8 @@ export const orderAPI = {
   getAdminDetail: (id)   => api.get(`/orders/${id}`),
   updateStatus:   (id,d) => api.patch(`/orders/${id}`, d),
   remove:         (id)   => api.delete(`/orders/${id}`),
+  addPayment:     (id,d) => api.post(`/orders/${id}/payments`, d),
+  updatePayment:  (id,d) => api.patch(`/admin/payments/${id}`, d),
 };
 export const bankAPI = {
   get:     ()  => api.get('/bank'),

@@ -31,12 +31,12 @@ export default function OrderConfirm() {
   }, [orderNumber]);
 
   const PL = {
-    fr: { full:'Paiement intégral (-5%)', deposit:'Acompte 25%',   monthly:'Mensualités 60 mois' },
-    en: { full:'Full payment (-5%)',       deposit:'25% deposit',   monthly:'60 monthly payments' },
-    de: { full:'Vollzahlung (-5%)',        deposit:'Anzahlung 25%', monthly:'60 Raten' },
-    es: { full:'Pago completo (-5%)',      deposit:'Señal 25%',     monthly:'60 cuotas' },
-    it: { full:'Pagamento completo (-5%)', deposit:'Acconto 25%',   monthly:'60 rate' },
-    pt: { full:'Pagamento integral (-5%)', deposit:'Entrada 25%',   monthly:'60 parcelas' },
+    fr: { full:'Paiement intégral (-5%)', deposit:'Acompte 25%',   monthly:'Acompte 25% + 60 mensualités' },
+    en: { full:'Full payment (-5%)',       deposit:'25% deposit',   monthly:'25% deposit + 60 monthly payments' },
+    de: { full:'Vollzahlung (-5%)',        deposit:'Anzahlung 25%', monthly:'25% Anzahlung + 60 Raten' },
+    es: { full:'Pago completo (-5%)',      deposit:'Señal 25%',     monthly:'Señal 25% + 60 cuotas' },
+    it: { full:'Pagamento completo (-5%)', deposit:'Acconto 25%',   monthly:'Acconto 25% + 60 rate' },
+    pt: { full:'Pagamento integral (-5%)', deposit:'Entrada 25%',   monthly:'Entrada 25% + 60 parcelas' },
   };
 
   const L = {

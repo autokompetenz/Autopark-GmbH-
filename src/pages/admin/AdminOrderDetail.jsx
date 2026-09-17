@@ -6,7 +6,10 @@ import { formatEuro, formatDate, timeAgo } from '../../utils/helpers';
 import { StatusBadge, Loader } from '../../components/UI';
 
 const STATUS_LABELS = { pending:'En attente', confirmed:'Confirmée', processing:'En traitement', shipped:'Expédiée', delivered:'Livrée', cancelled:'Annulée' };
-const PAYMENT_LABELS = { full:'Paiement intégral (-5%)', deposit:'Acompte 25%', monthly:'Mensualités 60 mois' };
+const PAYMENT_LABELS = { full:'Paiement intégral (-5%)', deposit:'Acompte 25%', monthly:'Acompte 25% + 60 mensualités' };
+const INSTALLMENT_LABELS = { full:'Total', deposit:'Acompte', monthly:'Mensualité', balance:'Solde' };
+const PAY_STATUS_LABELS = { pending:'À payer', paid:'Payé', late:'En retard', cancelled:'Annulé' };
+const PAY_STATUS_COLORS = { pending:'var(--text-3)', paid:'var(--green)', late:'#EF4444', cancelled:'var(--text-3)' };
 
 export default function AdminOrderDetail() {
   const { id } = useParams();
@@ -16,6 +19,9 @@ export default function AdminOrderDetail() {
   const [newStatus, setNewStatus] = useState('');
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
+  const [paySaving, setPaySaving] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ type:'monthly', amount:'', dueDate:'' });
 
   const load = () => {
     orderAPI.getAdminDetail(id)
@@ -23,6 +29,46 @@ export default function AdminOrderDetail() {
       .catch(() => setLoading(false));
   };
   useEffect(load, [id]);
+
+  const markPaid = async (p) => {
+    setPaySaving(true);
+    try {
+      await orderAPI.updatePayment(p.id, { status: p.status === 'paid' ? 'pending' : 'paid' });
+      addToast(p.status === 'paid' ? 'Paiement remis en attente.' : `Paiement de ${formatEuro(p.amount)} validé.`, 'success');
+      load();
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Erreur', 'error');
+    } finally { setPaySaving(false); }
+  };
+
+  const addPayment = async (e) => {
+    e.preventDefault();
+    setPaySaving(true);
+    try {
+      await orderAPI.addPayment(id, {
+        type: addForm.type,
+        amount: Number(addForm.amount),
+        dueDate: addForm.dueDate ? new Date(addForm.dueDate).toISOString() : null,
+      });
+      addToast('Paiement ajouté à l’échéancier.', 'success');
+      setAddForm({ type:'monthly', amount:'', dueDate:'' });
+      setAddOpen(false);
+      load();
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Erreur', 'error');
+    } finally { setPaySaving(false); }
+  };
+
+  const updatePayStatus = async (p, status) => {
+    setPaySaving(true);
+    try {
+      await orderAPI.updatePayment(p.id, { status });
+      addToast(p.status === status ? 'Aucun changement.' : `Statut passé à « ${status} ».`, 'info');
+      load();
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Erreur', 'error');
+    } finally { setPaySaving(false); }
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -58,6 +104,9 @@ export default function AdminOrderDetail() {
     padding:24,
     boxShadow:'var(--shadow-sm)',
   };
+
+  const payments = (order.payments || []).sort((a,b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
+  const remaining = payments.filter(p => p.status !== 'paid' && p.status !== 'cancelled').reduce((s,p) => s + p.amount, 0);
 
   return (
     <div style={{ padding:'clamp(24px,5vw,48px) clamp(16px,4vw,44px) 60px', minHeight:'100vh', background:'var(--bg)' }}>
@@ -146,6 +195,93 @@ export default function AdminOrderDetail() {
                 </a>
               </div>
             )}
+          </div>
+
+          <div style={cardStyle}>
+            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:16 }}>
+              <p style={{ fontSize:11, fontWeight:800, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--red)' }}>Échéancier de paiement</p>
+              <button onClick={() => setAddOpen(v => !v)} className="btn-primary"
+                style={{ padding:'8px 14px', fontSize:12, background: addOpen ? 'var(--bg-card2)' : undefined, border: addOpen ? '1px solid var(--border)' : undefined, color: addOpen ? 'var(--text)' : undefined }}>
+                {addOpen ? '− Fermer' : '+ Ajouter un paiement'}
+              </button>
+            </div>
+
+            {addOpen && (
+              <form onSubmit={addPayment} style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:18, padding:14, border:'1px dashed var(--border)', borderRadius:8 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                  <select value={addForm.type} onChange={e => setAddForm({ ...addForm, type:e.target.value })}
+                    className="input-luxury" style={{ padding:'10px 12px', fontSize:14 }}>
+                    {Object.entries(INSTALLMENT_LABELS).map(([k,v]) => (
+                      <option key={k} value={k}>{v}</option>
+                    ))}
+                  </select>
+                  <input type="number" min="0" step="0.01" value={addForm.amount} onChange={e => setAddForm({ ...addForm, amount:e.target.value })}
+                    placeholder="Montant (€)" className="input-luxury" style={{ padding:'10px 12px', fontSize:14 }} required />
+                </div>
+                <input type="date" value={addForm.dueDate} onChange={e => setAddForm({ ...addForm, dueDate:e.target.value })}
+                  className="input-luxury" style={{ padding:'10px 12px', fontSize:14 }} />
+                <button type="submit" disabled={paySaving} className="btn-primary" style={{ padding:'10px 16px', fontSize:13, justifyContent:'center' }}>
+                  {paySaving ? '⏳...' : 'Enregistrer le paiement'}
+                </button>
+              </form>
+            )}
+
+            <p style={{ fontSize:13, fontWeight:700, color:'var(--text-3)', marginBottom:12 }}>
+              Restant à payer : <span style={{ color:'var(--green)', fontWeight:900 }}>{formatEuro(remaining)}</span>
+            </p>
+
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {payments.length === 0 && (
+                <p style={{ fontSize:14, color:'var(--text-3)' }}>Aucun paiement enregistré.</p>
+              )}
+              {payments.map(p => (
+                <div key={p.id} style={{
+                  display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:8,
+                  padding:'10px 12px', borderRadius:8, border:'1px solid var(--border)',
+                  background: p.status==='late' ? 'rgba(239,68,68,0.05)' : p.status==='paid' ? 'rgba(22,163,74,0.05)' : 'var(--bg-card2)',
+                  opacity:p.status==='cancelled'?0.55:1,
+                }}>
+                  <div style={{ minWidth:0 }}>
+                    <p style={{ fontWeight:700, color:'var(--text)', fontSize:14 }}>
+                      {INSTALLMENT_LABELS[p.type] || p.type}
+                      {p.amount === order.depositAmount && p.type==='deposit' && ' (25%)'}
+                    </p>
+                    <p style={{ fontSize:12, color:'var(--text-3)', marginTop:2 }}>
+                      {p.dueDate ? formatDate(p.dueDate) : 'À la livraison'}
+                      {p.reference ? ` · ${p.reference}` : ''}
+                    </p>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                    <p style={{ fontFamily:"'Outfit',sans-serif", fontWeight:800, fontSize:16, color:'var(--red)', flexShrink:0 }}>{formatEuro(p.amount)}</p>
+                    <span style={{
+                      fontSize:11, fontWeight:800, letterSpacing:'0.06em', textTransform:'uppercase', flexShrink:0,
+                      color:PAY_STATUS_COLORS[p.status]||'var(--text-3)', border:`1px solid ${PAY_STATUS_COLORS[p.status]||'var(--border)'}`,
+                      borderRadius:999, padding:'3px 10px',
+                    }}>
+                      {PAY_STATUS_LABELS[p.status] || p.status}
+                    </span>
+                    {(p.status === 'pending' || p.status === 'late' || p.status === 'paid') && (
+                      <div style={{ display:'flex', gap:4 }}>
+                        {p.status === 'paid' ? (
+                          <button onClick={() => updatePayStatus(p, 'pending')} disabled={paySaving} title="Remettre en attente"
+                            className="btn-ghost" style={{ padding:'5px 10px', fontSize:11 }}>↺</button>
+                        ) : (
+                          <button onClick={() => markPaid(p)} disabled={paySaving} title="Marquer payé"
+                            className="btn-primary" style={{ padding:'5px 10px', fontSize:11 }}>✓</button>
+                        )}
+                        {p.status !== 'paid' && p.status !== 'cancelled' && (
+                          <button onClick={() => updatePayStatus(p, p.status === 'late' ? 'pending' : 'late')} disabled={paySaving}
+                            title={p.status === 'late' ? 'Repasser à payer' : 'Marquer en retard'}
+                            className="btn-ghost" style={{ padding:'5px 10px', fontSize:11, color:'#EF4444', borderColor:'rgba(239,68,68,0.4)' }}>!</button>
+                        )}
+                        <button onClick={() => updatePayStatus(p, 'cancelled')} disabled={paySaving} title="Annuler ce paiement"
+                          className="btn-ghost" style={{ padding:'5px 10px', fontSize:11 }}>✕</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {order.tracking?.length > 0 && (

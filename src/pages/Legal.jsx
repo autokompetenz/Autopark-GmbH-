@@ -165,7 +165,7 @@ Capital social : 230.000,00 €</p>
 <h2>Article 2 — Prix</h2>
 <p>Prix en Euros (€) TTC. Modifiables à tout moment.</p>
 <h2>Article 3 — Paiement</h2>
-<ul><li><strong>Intégral</strong> : remise de 5%</li><li><strong>Acompte 25%</strong> : solde à livraison</li><li><strong>Mensualités</strong> : 60 mois à 6%/an</li></ul>
+<ul><li><strong>Intégral</strong> : remise de 5%</li><li><strong>Acompte 25%</strong> : solde à livraison</li><li><strong>Acompte 25% + Mensualités</strong> : 75% financé sur 60 mois à 6%/an</li></ul>
 <h2>Article 4 — Rétractation</h2>
 <p>14 jours à compter de la réception (directive 2011/83/UE).</p>
 <h2>Article 5 — Droit applicable</h2>
@@ -174,7 +174,7 @@ Capital social : 230.000,00 €</p>
 <h2>Article 1 — Subject</h2>
 <p>These T&Cs govern purchases from Autopark GmbH.</p>
 <h2>Article 2 — Payment</h2>
-<ul><li>Full payment: 5% discount</li><li>25% deposit: balance on delivery</li><li>Monthly: 60 instalments at 6%/year</li></ul>
+<ul><li>Full payment: 5% discount</li><li>25% deposit: balance on delivery</li><li>25% deposit + Monthly: 75% financed over 60 instalments at 6%/year</li></ul>
 <h2>Article 3 — Withdrawal</h2>
 <p>14-day right of withdrawal (EU Directive 2011/83/EU).</p>
 <h2>Article 4 — Applicable Law</h2>
@@ -183,7 +183,7 @@ Capital social : 230.000,00 €</p>
 <h2>§ 1 Geltungsbereich</h2>
 <p>Diese AGB gelten für alle Verträge mit Autopark GmbH.</p>
 <h2>§ 2 Zahlung</h2>
-<ul><li>Vollzahlung: 5% Rabatt</li><li>Anzahlung 25%: Rest bei Lieferung</li><li>Ratenzahlung: 60 Monate, 6% p.a.</li></ul>
+<ul><li>Vollzahlung: 5% Rabatt</li><li>Anzahlung 25%: Rest bei Lieferung</li><li>Anzahlung 25% + Raten: 75% finanziert über 60 Monate, 6% p.a.</li></ul>
 <h2>§ 3 Widerrufsrecht</h2>
 <p>14 Tage Widerrufsrecht gemäß § 312g BGB.</p>
 <h2>§ 4 Gerichtsstand</h2>
